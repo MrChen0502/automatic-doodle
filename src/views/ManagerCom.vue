@@ -39,19 +39,23 @@
                 <el-table-column label="操作">
                     <template #default="scoped">
                         <div>
-                            <el-button type="primary" @click="openDialog(2, scoped.row)"><el-icon><Edit /></el-icon></el-button>
-                            <el-button type="warning"><el-icon><Delete /></el-icon></el-button>
+                            <el-button type="primary" @click="openDialog(2, scoped.row)"><el-icon>
+                                    <Edit />
+                                </el-icon></el-button>
+                            <el-button type="warning"><el-icon>
+                                    <Delete />
+                                </el-icon></el-button>
                         </div>
                     </template>
                 </el-table-column>
             </el-table>
-            
+
             <!-- 分页区 -->
             <div class="page">
                 <el-pagination :total="total" v-model:current-page="page" @current-change="handleCurrent" />
             </div>
         </el-card>
-        <UpdateManager v-model:propTitle="ParentData.title" :roleList="rolelist"/>
+        <UpdateManager v-model:propTitle="ParentData.title" :roleList="rolelist" :propItem="currentEditItem" />
     </div>
 </template>
 
@@ -60,7 +64,7 @@ import { ref, reactive } from 'vue';
 import { Search, Edit, Delete } from '@element-plus/icons-vue';
 import { getManager, getaddManager } from '@/api/manager';
 import { ElMessage } from 'element-plus';
-import UpdateManager from '../components/UpdateManager.vue'; 
+import UpdateManager from '../components/UpdateManager.vue';
 
 let keyword = ref(null)
 let page = ref(1)
@@ -71,11 +75,13 @@ let isLoading = ref(true)
 let isDialog = ref(false)
 let ruleAddmanageDOM = ref(null)
 let switchLoading = ref(false)
-let rolelist = ([])
+let rolelist = ref([])
+// 定义存储当前编辑项的数据
+let currentEditItem = ref({})
 
 // 父组件要传给子组件的数据
 let ParentData = reactive({
-    title : ''
+    title: ''
 })
 
 // 获取管理员列表
@@ -110,18 +116,20 @@ const handleCurrent = (val) => {
 // 打开添加弹窗
 // 如果type=1，启动添加管理员对话框;如果type=2启动编辑管理员对话框
 // 如果item为空，则启动添加管理员对话框;如果item不为空则启动编辑管理员对话框:
-const openDialog = ( type , item = {}) => {
+const openDialog = (type, item = {}) => {
     isDialog.value = true
 
-    switch( type ){
+    switch (type) {
         case 1:
-        // 添加管理员
-        ParentData.title = '添加管理员'
-        break;
+            // 添加管理员
+            ParentData.title = '添加管理员'
+            currentEditItem.value = {}  // 添加时清空
+            break;
         case 2:
-        // 编辑管理员
-        ParentData.title = '编辑管理员'
-        break;
+            // 编辑管理员
+            ParentData.title = '编辑管理员'
+            currentEditItem.value = { ...item }  // 保存当前行数据
+            break;
     }
 }
 

@@ -10,12 +10,18 @@
                 <el-container style="height: 100%;">
                     <el-container>
                         <!-- 图库分类子组件 -->
-                        <PicListAside ref="childFn" />
+                        <PicListAside ref="childFn" @changeid="changeCatelist" />
                         <!-- 图库列表子组件 -->
-                        <PicListMain ref="picmainRef" />
+                        <PicListMain ref="picmainRef"  @selectImgData="SelectImgFn"/>
                     </el-container>
                 </el-container>
             </el-card>
+            <template #footer>
+                <span class="dislog-footer">
+                    <el-button type="info" plain @click="isDialog=false">取消</el-button>
+                    <el-button type="primary" plain @click="submitImg">确定</el-button>
+                </span>
+            </template>
         </el-dialog>
     </div>
 </template>
@@ -32,9 +38,35 @@ import PicListMain from './PicListMain.vue';
 let isDialog = ref(false);
 const childFn = ref(null);
 const picmainRef = ref(null);
+let avatarUrl = []
+const props = defineProps({
+    modelValue : [String , Array]
+})
+const emits = defineEmits(['update:modelValue'])
 
 /********************************************************************* */
 
+//创建获取子组件传递过来的数据分类ID，将id调用到查询图库列表的函数中
+const changeCatelist = (cate_id) => {
+    console.log(cate_id);
+    picmainRef.value.getCateID(cate_id)
+}
+
+// 接收子组件传递过来的数据
+const SelectImgFn = (val) =>{
+    console.log(val);
+    avatarUrl = val.map( item => item.url )
+    console.log("地址是："+avatarUrl);
+}
+
+// 将选中的图片提交给UpdateManager父组件
+const submitImg = () =>{
+    // 修改父组件中v-model绑定的数据，将最近的modelValue传递给父组件
+    if(avatarUrl.length){
+        emits('update:modelValue' , avatarUrl[0])
+    }
+    isDialog.value = false;
+}
 
 </script>
 

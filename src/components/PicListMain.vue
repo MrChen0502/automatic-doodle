@@ -8,10 +8,13 @@
                             <!-- 图片 -->
                             <el-image fit="cover" :src="item.url" :preview-src-list="[item.url]" />
                             <p>{{ item.name }}</p>
-                            <!-- 操作区 -->
-                            <div class="pic_edit">
+                            <!-- 操作区:根据当前路由地址判断执行重命名+删除操作还是复选框效果 -->
+                            <div class="pic_edit" v-if="$route.path == '/admin/image/list'">
                                 <span @click="openDiaChangePicName(item)">重命名</span>
                                 <span @click="updatePic(item.id)">删除</span>
+                            </div>
+                            <div class="pic_edit" v-else-if="$route.path == '/admin/manager/list'">
+                                <el-checkbox v-model="item.checked" @change="selecetImgFn(item)" />
                             </div>
                         </el-card>
                     </el-col>
@@ -27,7 +30,7 @@
         </el-main>
 
         <!-- 对话框 -->
-        <el-dialog v-model="data.isDialog" title="图片重命名" width="30%" @close="closeUploadDia">
+        <el-dialog v-model="data.isDialog" title="图片重命名" width="30%" @close="cancelDia">
             <el-form label="图片ID">
                 <el-form-item>
                     <el-input v-model="formPicName.id" :readonly="true" />
@@ -55,12 +58,13 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { getPicList } from '@/api/pics.js';
 import { ElMessage } from 'element-plus';
 import { editPicName, delPic } from '@/api/pics';
 import { ElMessageBox } from 'element-plus';
 import UploadCom from './UploadCom.vue';
+import { useRoute } from 'vue-router';
 
 let isLoading = ref(false)
 
@@ -94,6 +98,10 @@ const formPicName = reactive({
 const uploadData = reactive({
     diaUpload: false,  //上传图片对话框的显示隐藏控制
 })
+
+// 初始化路由对象
+const route = useRoute();
+const emits = defineEmits(['selectImgData'])
 
 // 分页事件
 const handleCurrentChange = (p) => {
@@ -170,12 +178,9 @@ const getCateID = (cate_id) => {
 
 // 调用请求接口函数
 const getPics = async () => {
-
     isLoading.value = true
 
-    // 调用请求接口
     let result = await getPicList(queryData.id, queryData.page, queryData.limit);
-
     isLoading.value = false
 
     if (result.msg != 'ok' || !result.data) {
@@ -183,7 +188,21 @@ const getPics = async () => {
         return
     }
 
-    data.piclist = result.data.list;
+    // 根据路由决定是否需要 checked 属性
+    switch (route.path) {
+        case '/admin/manager/list':
+            data.piclist = result.data.list.map(item => {
+                item.checked = false;
+                return item;
+            });
+            break;
+        case '/admin/image/list':
+            data.piclist = result.data.list;
+            break;
+        default:
+            data.piclist = result.data.list;
+    }
+
     data.total = result.data.totalCount
 }
 
@@ -208,6 +227,25 @@ const uploadaddsuccess = () => {
         uploadData.diaUpload = false;
     }, 500)
 
+}
+
+// 设置计算属性，将data.piclist数组中被选中的图片筛选出来：将每一组数组中的checked进行判断
+const checkedIMG = computed(() => {
+    // 过滤条件：checked属性为true
+    return data.piclist.filter(item => item.checked)
+})
+
+// 当每一个复选框分别触发改变事件时都将进行以下操作：1.判断是否有选中图片；2.是否多选了图片
+const selecetImgFn = (val) => {
+    if (val.checked) {
+        // 先把所有图片取消选中
+        data.piclist.forEach(item => {
+            item.checked = false
+        })
+        // 再把当前这张选中(一次只能选中一张图片)
+        val.checked = true
+    }
+    emits('selectImgData' , checkedIMG.value)
 }
 
 // 将获取分类ID并请求数据的函数共享给父组件:只要父组件传ID给我的时候，那么直接自动调用请求函数

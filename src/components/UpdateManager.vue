@@ -18,7 +18,7 @@
                 <el-form-item label="所属角色" prop="role_id">
                     <el-select v-model="ModelFormData.role_id" placeholder="请选择管理员角色" class="select-width"
                         @change="ChangeRoleFn">
-                        <el-option v-for="item in roleList" :key="item.id" :label="item.name" :value="item.id" />
+                        <el-option v-for="item in props.roleList" :key="item.id" :label="item.name" :value="item.id" />
                     </el-select>
                 </el-form-item>
 
@@ -30,7 +30,7 @@
                 <el-form-item label="账号状态" prop="status" v-show="propTitle === '添加管理员'">
                     <el-switch v-model="ModelFormData.status" :active-value="1" :inactive-value="0" active-text="激活"
                         inactive-text="冻结" inline-prompt style="--el-switch-on-color:#13ce66;"
-                        @change="ChageStatusFn" />
+                        @change="ChangeStatusFn" />
                 </el-form-item>
 
             </el-form>
@@ -80,7 +80,6 @@ const RuleFormItem = reactive({
         { required: true, message: "请选择状态", trigger: 'blur' }
     ],
 })
-let roleList = ref([])    //角色列表
 
 // 接收父组件传递过来的数据(不能直接在子组件内更新父组件传过来的数据，只读不更新)
 const props = defineProps({
@@ -104,7 +103,7 @@ watch(() => props.propTitle, (newVal) => {
     console.log(newVal);
     //只有当标题发生改变时对话框才会生效，因此在关闭对弹窗时需要清空标题以免上一次与当前操作的标题一致而无法打开弹窗
     isDialog.value = newVal == null ? false : true;
-    isDialog.value = true;
+    // isDialog.value = true;
 });
 watch(() => props.propItem, (newVal) => {
     console.log(newVal);
@@ -118,7 +117,7 @@ watch(() => props.propItem, (newVal) => {
 })
 
 // 初始化修改管理员状态函数
-const ChageStatusFn = (e) => {
+const ChangeStatusFn = (e) => {
     console.log(e);
     ModelFormData.status = e;
 }
