@@ -1,40 +1,56 @@
 <template>
-    <div class="updatemanager">
+    <div class="updatermanager">
         <!-- v-model不允许绑定prop的任何数据，需要通过监听prop来确认绑定的数据结果 -->
-        <el-dialog v-model="isDialog" :title="propTitle" width="40%" :close-on-click-model="false"
+        <!-- close-on-click-modal点击遮罩层关闭对话框 -->
+        <el-dialog v-model="isDialog" :title="propTitle" width="40%" :close-on-click-modal="false"
             @close="closeChildDiaFn">
+
             <el-form :model="ModelFormData" ref="RefFormDom" :rules="RuleFormItem" label-width="150px">
+
                 <el-form-item label="管理员用户名" prop="username">
                     <el-input v-model="ModelFormData.username" />
                 </el-form-item>
-                <el-form-item label="登录密码" prop="password">
-                    <el-input v-model="ModelFormData.password" />
+
+                <el-form-item label="设置登录密码" prop="password" v-if="propTitle === '添加管理员'">
+                    <el-input password show-password v-model="ModelFormData.password" />
                 </el-form-item>
-                <el-form-item label="用户ID" prop="role_id">
-                    <el-select v-model="ModelFormData.role_id" placeholder="请选择管理员角色" @close="ChangeRoleFn">
-                        <el-option v-for="item in roleList" key="item.name" :value="item.id" />
+
+                <el-form-item label="所属角色" prop="role_id">
+                    <el-select v-model="ModelFormData.role_id" placeholder="请选择管理员角色" class="select-width"
+                        @change="ChangeRoleFn">
+                        <el-option v-for="item in roleList" :key="item.id" :label="item.name" :value="item.id" />
                     </el-select>
                 </el-form-item>
 
-                <el-form-item label="管理员状态" prop="status">
-                    <el-switch v-model="ModelFormData.status" />
+                <el-form-item label="上传头像" prop="avatar">
+                    <!-- 调用图库管理查询显示的结构 -->
+                     <SelectImage v-model="ModelFormData.avatar"/>
                 </el-form-item>
-                <el-form-item label="管理员头像" prop="avatar">
-                    <el-input v-model="ModelFormData.avatar" />
+
+                <el-form-item label="账号状态" prop="status" v-show="propTitle === '添加管理员'">
+                    <el-switch v-model="ModelFormData.status" :active-value="1" :inactive-value="0" active-text="激活"
+                        inactive-text="冻结" inline-prompt style="--el-switch-on-color:#13ce66;"
+                        @change="ChageStatusFn" />
                 </el-form-item>
+
             </el-form>
+
             <template #footer>
-                <el-button type="info" @click="closeChildDiaFn">取消</el-button>
-                <el-button type="primary" @click="AddManageFn">确定</el-button>
+                <span class="dialog-footer">
+                    <el-button type="info" @click="closeChildDiaFn">取消</el-button>
+                    <el-button type="success" @click="AddManageFn">确认添加</el-button>
+                </span>
             </template>
+
         </el-dialog>
     </div>
 </template>
 
 <script setup>
 import { ElMessage } from 'element-plus'
-import { EditManager , getaddManager } from '../api/manager'
+import { EditManager, getaddManager } from '../api/manager'
 import { reactive, ref, watch } from 'vue'
+import SelectImage from './SelectImage.vue'
 
 
 let isDialog = ref(false)
@@ -125,8 +141,20 @@ const AddManageFn = () => {
             // 执行关闭对话框
             closeChildDiaFn()
         } else if (props.propTitle == '编辑管理员') {
+            let result = await EditManager(props.propItem.id, ModelFormData)
+            if (result.msg != 'ok' || !result.data) {
+                // 进度条(未添加)
 
+                return ElMessage.error(result.msg)
+            }
+            ElMessage.success('修改成功')
         }
+        // 子组件告知父组件需要重新查询数据
+        emits('updateChild')
+        // 执行关闭对话框操作
+        closeChildDiaFn();
+        // 进度条(未添加)
+
     })
 }
 
