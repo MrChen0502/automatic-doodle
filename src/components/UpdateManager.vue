@@ -17,7 +17,7 @@
                 </el-form-item>
 
                 <el-form-item label="管理员状态" prop="status">
-                    <el-switch  v-model="ModelFormData.status" />
+                    <el-switch v-model="ModelFormData.status" />
                 </el-form-item>
                 <el-form-item label="管理员头像" prop="avatar">
                     <el-input v-model="ModelFormData.avatar" />
@@ -47,7 +47,7 @@ let ModelFormData = reactive({
 })          //绑定表单数据
 const RefFormDom = ref(null) //绑定表单DOM元素
 
-const emits = defineEmits(['updateChild' , 'update:propTitle'])
+const emits = defineEmits(['updateChild', 'update:propTitle'])
 
 // 表单验证规则
 const RuleFormItem = reactive({
@@ -90,7 +90,7 @@ watch(() => props.propTitle, (newVal) => {
     isDialog.value = newVal = null ? false : true;
     isDialog.value = true;
 });
-watch(() => props.propItem , (newVal) =>{
+watch(() => props.propItem, (newVal) => {
     console.log(newVal);
     //关闭对话框清空表单
     ModelFormData.username = newVal.username //用户名

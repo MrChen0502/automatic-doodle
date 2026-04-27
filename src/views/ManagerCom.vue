@@ -51,8 +51,7 @@
                 <el-pagination :total="total" v-model:current-page="page" @current-change="handleCurrent" />
             </div>
         </el-card>
-        <UpdateManager v-model:propTitle="ParentData.title" :roleList="rolelist"
-        @updateChild="getDataList" :propItem="ParentData.row"/>
+        <UpdateManager v-model:propTitle="ParentData.title" :roleList="rolelist"/>
     </div>
 </template>
 
@@ -122,7 +121,6 @@ const openDialog = ( type , item = {}) => {
         case 2:
         // 编辑管理员
         ParentData.title = '编辑管理员'
-        ParentData.row = item
         break;
     }
 }
