@@ -103,16 +103,18 @@ const props = defineProps({
 watch(() => props.propTitle, (newVal) => {
     console.log(newVal);
     //只有当标题发生改变时对话框才会生效，因此在关闭对弹窗时需要清空标题以免上一次与当前操作的标题一致而无法打开弹窗
-    isDialog.value = newVal = null ? false : true;
+    isDialog.value = newVal == null ? false : true;
     isDialog.value = true;
 });
 watch(() => props.propItem, (newVal) => {
     console.log(newVal);
-    //关闭对话框清空表单
-    ModelFormData.username = newVal.username //用户名
+    if(newVal != null){
+        ModelFormData.username = newVal.username //用户名
     ModelFormData.role_id = newVal.role_id   //所属角色ID
     ModelFormData.avatar = newVal.avatar    //头像
     ModelFormData.status = newVal.status    //头像
+    }
+
 })
 
 // 初始化修改管理员状态函数
