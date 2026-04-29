@@ -1,6 +1,7 @@
 <template>
     <div class="selectimage">
         <el-icon class="plusicon" size="40" @click=" isDialog = true">
+            <img v-if="props.modelValue" :src="props.modelValue" class="preview-image" />
             <Plus />
         </el-icon>
 
@@ -63,8 +64,10 @@ const SelectImgFn = (val) =>{
 const submitImg = () =>{
     // 修改父组件中v-model绑定的数据，将最近的modelValue传递给父组件
     if(avatarUrl.length){
-        emits('update:modelValue' , avatarUrl[0])
+        emits('update:modelValue' , avatarUrl[0]);
+        console.log('提交的图片URL：', avatarUrl[0]);
     }
+    console.log(avatarUrl);
     isDialog.value = false;
 }
 
@@ -86,5 +89,10 @@ const submitImg = () =>{
         padding-bottom: 20px !important;
     }
 
+}
+
+.preview-image {
+    width: 100px;
+    height: 100px;
 }
 </style>

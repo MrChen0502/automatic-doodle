@@ -2,10 +2,11 @@
 import request from '@/utils/request'
 
 // 用户数据
-export const getUserData = () => {
+export const getUserData = (params = {}) => {
     return request({
         url: 'admin/user/1',
         method: 'GET',
+        params: params  // 关键：要把参数传进去
     })
 }
 

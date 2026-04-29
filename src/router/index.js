@@ -78,7 +78,7 @@ const routes = [
       {
         path : 'access/list',
         meta : { title : '权限管理' },
-        name : 'ManagerCom',
+        name : 'RulesCom',
         component : ()=> import('@/views/RulesCom.vue')
       }
     ]

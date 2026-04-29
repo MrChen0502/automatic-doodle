@@ -17,3 +17,20 @@ export const InsertRuleFn = (data) =>{
         data,
     })
 }
+
+// 编辑菜单
+export const updateRuleFn = (id,data) =>{
+    return request({
+        url : `admin/rule/${id}`,
+        method : 'POST',
+        data
+    })
+}
+
+// 删除菜单
+export const deleteRuleFn = (id) => {
+    return request({  
+        url: `admin/rule/${id}/delete`, 
+        method: 'POST',
+    })
+}

@@ -109,9 +109,9 @@ watch(() => props.propItem, (newVal) => {
     console.log(newVal);
     if(newVal != null){
         ModelFormData.username = newVal.username //用户名
-    ModelFormData.role_id = newVal.role_id   //所属角色ID
-    ModelFormData.avatar = newVal.avatar    //头像
-    ModelFormData.status = newVal.status    //头像
+        ModelFormData.role_id = newVal.role_id   //所属角色ID
+        ModelFormData.avatar = newVal.avatar    //头像
+        ModelFormData.status = newVal.status    //头像
     }
 
 })

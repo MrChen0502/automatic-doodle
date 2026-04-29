@@ -42,9 +42,11 @@
                             <el-button type="primary" @click="openDialog(2, scoped.row)"><el-icon>
                                     <Edit />
                                 </el-icon></el-button>
-                            <el-button type="warning"><el-icon>
+                            <el-button type="warning" @click="deleteuser(scoped.row)">
+                                <el-icon>
                                     <Delete />
-                                </el-icon></el-button>
+                                </el-icon>
+                            </el-button>
                         </div>
                     </template>
                 </el-table-column>
@@ -62,9 +64,10 @@
 <script setup>
 import { ref, reactive } from 'vue';
 import { Search, Edit, Delete } from '@element-plus/icons-vue';
-import { getManager, getaddManager } from '@/api/manager';
-import { ElMessage } from 'element-plus';
+import { getManager, getaddManager} from '@/api/manager';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import UpdateManager from '../components/UpdateManager.vue';
+import { DeleteManager } from '../api/manager';
 
 let keyword = ref(null)
 let page = ref(1)
@@ -138,6 +141,30 @@ const handCancel = () => {
     isDialog.value = false;
     // 清空表单验证提示
     ruleAddmanageDOM.value?.clearValidate()
+}
+
+// 删除管理员
+const deleteuser = (item) =>{
+    ElMessageBox.confirm(
+        `确定要删除"${item.keyword}"吗？此操作不可恢复！`,
+        '警告',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    ).then(async () => {
+        const result = await DeleteManager(item.id);
+        
+        if (result.msg === 'ok') {
+            ElMessage.success('删除成功');
+            getDataList();  // 重新加载列表
+        } else {
+            ElMessage.error(result.msg || '删除失败');
+        }
+    }).catch(() => {
+        // 用户取消删除
+    });
 }
 
 </script>

@@ -32,3 +32,11 @@ export const EditManager = (id , data)=>{
         data
     })
 }
+
+// 删除管理员
+export const DeleteManager = (id)=>{
+    return request({
+        url : `admin/manager/${id}/delete`,
+        method : 'POST',
+    })
+}

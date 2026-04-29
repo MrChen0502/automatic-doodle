@@ -3,7 +3,7 @@
         <el-card>
             <!-- 顶部 -->
             <header>
-                <el-button type="success" plain @click="openDialog">新增</el-button>
+                <el-button type="success" plain @click.stop="openDialog(1)">新增</el-button>
             </header>
 
             <!-- 底部 -->
@@ -24,9 +24,10 @@
                         <div class="right">
                             <el-switch v-model="data.status" :inactice-value="0" :active-value="1" inactive-text="禁用" active-text="应用"/>
 
-                            <el-button type="warning" size="small" plain>
+                            <!-- 修改 -->
+                            <el-button type="warning" size="small" plain  @click.stop="openDialog(2 , data)">
                                 <el-icon>
-                                    <EditPen />
+                                    <EditPen/>
                                 </el-icon>
                             </el-button>
 
@@ -36,7 +37,7 @@
                                 </el-icon>
                             </el-button>
 
-                            <el-button type="danger" size="small" plain>
+                            <el-button type="danger" size="small" plain @click.stop="handleDelete(data)">
                                 <el-icon>
                                     <Delete />
                                 </el-icon>
@@ -48,12 +49,12 @@
         </el-card>
 
         <!-- 调用子组件 -->
-         <UpdateRules v-model:propTitle="isDialog" :menuList="data" @submitok="getRulesList"/>
+         <UpdateRules v-model:propTitle="isDialog" :menuList="data" @submitok="getRulesList" :propItem="rulesList"/>
     </div>
 </template>
 
 <script setup>
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { ref } from 'vue';
 import { getRulesListFn } from '../api/rules';
 import UpdateRules from '../components/UpdateRules.vue';
@@ -61,7 +62,7 @@ import UpdateRules from '../components/UpdateRules.vue';
 // 树形控件数据源
 const data = ref([])
 // 权限列表数据
-const rulesList = ref([])
+const rulesList = ref({})
 // 子节点数据属性指定
 const defaultKey = ref([])
 
@@ -91,8 +92,38 @@ const getRulesList = async ()=>{
 getRulesList();
 
 // 启动对话框
-const openDialog = ()=>{
-    isDialog.value = '新增';
+const openDialog = (type,item = {}) => {
+    if(type == 1){
+        isDialog.value = '新增';
+        rulesList.value = {};
+    }else if(type == 2){
+        isDialog.value = '编辑';
+        rulesList.value = {...item};
+    }
+}
+
+// 删除
+const handleDelete = (item) => {
+    ElMessageBox.confirm(
+        `确定要删除"${item.name}"吗？此操作不可恢复！`,
+        '警告',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning',
+        }
+    ).then(async () => {
+        const result = await deleteRuleFn(item.id);
+        
+        if (result.msg === 'ok') {
+            ElMessage.success('删除成功');
+            getRulesList();  // 重新加载列表
+        } else {
+            ElMessage.error(result.msg || '删除失败');
+        }
+    }).catch(() => {
+        // 用户取消删除
+    });
 }
 </script>
 

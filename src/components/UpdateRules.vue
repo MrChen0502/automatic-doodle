@@ -1,11 +1,11 @@
 <template>
     <el-dialog v-model="isDialogRules" :title="propTitle" width="50%" @close="CloseDialog">
         <el-form label-width="100px">
-            <el-form-item label="上级菜单">
+            <el-form-item label="上级菜单" v-if="propTitle == '新增'">
                 <el-cascader placeholder="商品管理/分类管理" :show-all-levels="false" v-model="form.rule_id" :options="menuList"
                     :props="cascaderProps" clearable></el-cascader>
             </el-form-item>
-            <el-form-item label="菜单/规则">
+            <el-form-item label="菜单/规则" v-if="propTitle == '新增'">
                 <el-radio-group v-model="form.menu">
                     <el-radio :value="1" size="large" border>菜单</el-radio>
                     <el-radio :value="0" size="large" border>权限</el-radio>
@@ -15,7 +15,7 @@
                 <el-input placeholder="请输入名称" v-model="form.name"></el-input>
             </el-form-item>
             <el-form-item label="菜单图标" v-if="form.menu == 1">
-                <IconSelect v-model="form.icon"/>
+                <IconSelect v-model:propicon="form.icon" />
             </el-form-item>
             <el-form-item label="排序">
                 <el-input-number v-model="form.order" @change="ChangeOrderFn"></el-input-number>
@@ -47,7 +47,7 @@
 
 <script setup>
 import { reactive, ref, watch } from 'vue';
-import { InsertRuleFn } from '@/api/rules';
+import { InsertRuleFn, updateRuleFn } from '@/api/rules';
 import { ElMessage } from 'element-plus';
 import IconSelect from './IconSelect.vue';
 
@@ -62,6 +62,10 @@ const props = defineProps({
     menuList: {            // 新增这个
         type: Array,
         default: () => []
+    },
+    propItem: {
+        type: Object,
+        default: {}
     }
 })
 
@@ -74,7 +78,7 @@ const cascaderProps = reactive({
     emitPath: false       // 只返回选中那级的 id
 })
 
-const form = ref({
+const form = reactive({
     rule_id: 0,    // 上级菜单 id 
     status: 0,        //状态
     name: '',          // 权限名称 
@@ -95,7 +99,7 @@ const methodData = ref([
 ])
 /*************************************************** */
 // 定义emits
-const emits = defineEmits(['update:propTitle' , 'submitok'])
+const emits = defineEmits(['update:propTitle', 'submitok'])
 
 /*************************************************** */
 
@@ -110,6 +114,20 @@ watch(() => props.propTitle, (newVal) => {
     }
 })
 /*************************************************** */
+
+// 检测propItem的值
+watch(() => props.propItem, (newVal) => {
+    console.log(newVal);
+    if (newVal != null) {
+        form.name = newVal.name;
+        form.icon = newVal.icon;
+        form.status = newVal.status;
+        form.order = newVal.order;
+    }
+})
+
+/*************************************************** */
+
 // 数字输入框：排序改变事件
 const ChangeOrderFn = (val) => {
     form.order = val;
@@ -119,19 +137,32 @@ const ChangeStatusFn = (val) => {
     form.status = val;
 }
 
-const InsertRulesFn = async ()=>{
-    switch(props.propTitle){
+const InsertRulesFn = async () => {
+    let result ;
+    switch (props.propTitle) {
         case '新增':
             // 请求数据
-            let result = await InsertRuleFn(form.value)
+            result = await InsertRuleFn(form)
             console.log(result);
-            
-            if(result.msg != 'ok' || !result.data) return ElMessage.error(result.msg);
+
+            if (result.msg != 'ok' || !result.data) return ElMessage.error(result.msg);
 
             // 关闭对话框
             CloseDialog();
             // 自定义事件：告知父组件添加成功，重新查询数据
             emits('submitok')
+            break;
+        case '编辑':
+            // 请求数据
+            result = await updateRuleFn(props.propItem.id, form)
+            console.log(result);
+
+            if (result.msg != 'ok' || !result.data) return ElMessage.error(result.msg);
+            // 关闭对话框
+            CloseDialog();
+            // 自定义事件：告知父组件添加成功，重新查询数据
+            emits('submitok')
+            break;
     }
 }
 
