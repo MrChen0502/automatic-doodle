@@ -80,6 +80,12 @@ const routes = [
         meta : { title : '权限管理' },
         name : 'RulesCom',
         component : ()=> import('@/views/RulesCom.vue')
+      },
+      {
+        path : 'role/list',
+        meta : { title : '角色管理' },
+        name : 'RoleCom',
+        component : ()=> import('@/views/RoleCom.vue')
       }
     ]
   },

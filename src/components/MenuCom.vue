@@ -11,7 +11,7 @@
              <template v-for="(item,index) in menusDataCom" :key="index">
                 <el-sub-menu  v-if="item.id != 5" :index='item.id+""' :key='item.id'>
                 <template #title>
-                    <el-icon>
+                    <el-icon v-if="item.icon">
                         <!-- ElementPlus的图标是作为组件使用的,所以动态使用图标相当于动态切换组件 -->
                         <component :is='item.icon'></component>
                     </el-icon>
@@ -20,7 +20,7 @@
                 <!-- 二级菜单区域 -->
                 <el-menu-item v-for='subItem in item.child' :index="'/admin'+subItem.frontpath" :key='subItem.id'>
                     <template #title>
-                        <el-icon>
+                        <el-icon v-if="subItem.icon">
                             <component :is="subItem.icon"></component>
                         </el-icon>
                         <span>{{ subItem.name }}{{ subItem.frontpath }}</span>

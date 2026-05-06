@@ -4,7 +4,7 @@
             <el-row :gutter="30">
                 <!-- 搜索框 -->
                 <el-col :span="8">
-                    <el-input v-model="keyword" placeholder="请输入管理员" @keyup.enter="handSearchUser" clearable>
+                    <el-input v-model="keyword" placeholder="请输入管理员" @keyup.enter="handSearchUser" clearable @clear="handclean">
                         <template #append>
                             <el-button :icon="Search" @click="handSearchUser"></el-button>
                         </template>
@@ -110,6 +110,11 @@ const handSearchUser = () => {
     // keyword.value = ''  // 删除这行
 }
 
+const handclean = () =>{
+    page.value = 1
+    getDataList()
+}
+
 // 分页
 const handleCurrent = (val) => {
     page.value = val
@@ -145,6 +150,8 @@ const handCancel = () => {
 
 // 删除管理员
 const deleteuser = (item) =>{
+    console.log("111");
+
     ElMessageBox.confirm(
         `确定要删除"${item.keyword}"吗？此操作不可恢复！`,
         '警告',
