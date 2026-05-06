@@ -21,8 +21,7 @@ let formDom = ref('');              //表单DOM元素
 // 表单验证规则
 let formRules = reactive({
     name : [{required : true , message : '角色名称不允许为空！！！' , trigger : 'blur'}],
-    desc : [{required : true , message : '角色描述不允许为空！！！' , trigger : 'blur'}],
-    status : [{required : true , message : '角色状态不允许为空！！！' , trigger : 'blur'}]
+    desc : [{required : true , message : '角色描述不允许为空！！！' , trigger : 'blur'}]
 })
 
 // 接收父组件传递过来的数据
