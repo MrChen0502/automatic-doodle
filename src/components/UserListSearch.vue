@@ -9,19 +9,19 @@
                 </el-select>
             </template>
             <template #append>
-                <el-button :icon="Search" @click="handlesearch"/>
+                <el-button :icon="Search" @click="handlesearch" />
             </template>
         </el-input>
     </div>
 
     <!-- Dialog对话框——自定义内容 -->
     <div class="userlistadd">
-        <el-button plain @click="opendialog">新增用户</el-button>
+        <el-button plain @click="opendialog(1)">新增用户</el-button>
     </div>
 
-    <el-dialog v-model="userlistadd" title="添加用户">
+    <el-dialog v-model="userlistadd" :title="title">
         <el-form :model="list" :rules="rules" ref="formRef">
-            <el-form-item required prop="username"  label="用户名字">
+            <el-form-item required prop="username" label="用户名字">
                 <el-input v-model="list.username" autocomplete="off" placeholder="请输入用户名字" />
             </el-form-item>
             <el-form-item required prop="user_level_id" label="会员等级">
@@ -29,7 +29,7 @@
                     <el-option v-for="(item, index) in gDatas" :key="index" :label="item.name" :value="item.id" />
                 </el-select>
             </el-form-item>
-            <el-form-item required prop="password" label="密码">
+            <!-- <el-form-item required prop="password" label="密码">
                 <el-input v-model="list.password" autocomplete="off" placeholder="请输入密码" />
             </el-form-item>
             <el-form-item required prop="nickname" label="昵称">
@@ -40,19 +40,14 @@
             </el-form-item>
             <el-form-item required prop="email" label="邮箱">
                 <el-input v-model="list.email" autocomplete="off" placeholder="请输入邮箱" />
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item required prop="status" label="状态">
                 <el-switch v-model="list.status" autocomplete="off" placeholder="请选择状态(0,1)" />
             </el-form-item>
             <!-- Upload上传器 -->
-            <el-form-item required prop="avatar" label="头像">
-                <el-upload class="Imlurl" :show-file-list="false" :on-change="handleFileChange" :auto-upload="false"
-                    v-model="list.avatar">
-                    <img v-if="list.avatar" :src="list.avatar" class="avatar" />
-                    <el-icon v-else>
-                        <Plus />
-                    </el-icon>
-                </el-upload>
+            <el-form-item label="头像" prop="avatar">
+                <!-- 调用图库管理查询显示的结构 -->
+                <SelectImage v-model="list.avatar" />
             </el-form-item>
 
         </el-form>
@@ -67,20 +62,29 @@
         </template>
     </el-dialog>
 
-
+    <!-- 上传图片对话框 -->
+    <!-- <el-dialog v-model="uploadData.diaUpload" title="上传图片" width="40%">
+        <p>
+            当前图库分类ID:{{ queryData.id }}
+        </p>
+        <UploadCom :data="{ image_class_id: queryData.id }" @uploadadd="uploadaddsuccess" />
+    </el-dialog> -->
 </template>
 
 <script setup>
-import { ref, reactive, computed , watch } from 'vue';
+import { ref, reactive, computed, watch } from 'vue';
 import { Search } from '@element-plus/icons-vue';
 import { Plus } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import { postUserData } from '@/api/user';
+import SelectImage from './SelectImage.vue';
 
 const searches = ref('')
 const searchRegion = ref('')
 const userlistadd = ref(false)
 const formRef = ref(null)
+
+let title = ref('添加用户')
 
 const emits = defineEmits(['searchhand']);
 
@@ -91,11 +95,11 @@ const props = defineProps({
 
 const list = reactive({
     username: '',
-    password: '',
+    // password: '',
     user_level_id: '',
-    nickname: '',
-    phone: '',
-    email: '',
+    // nickname: '',
+    // phone: '',
+    // email: '',
     avatar: '',
     status: 1
 })
@@ -155,7 +159,7 @@ const submitForm = async () => {
         status: list.status
     }
 
-    console.log('提交的数据：',submitData)
+    console.log('提交的数据：', submitData)
 
     const result = await postUserData(submitData)
 
@@ -164,24 +168,24 @@ const submitForm = async () => {
 
     // 清空表单
     list.username = ''
-    list.password = ''
+    // list.password = ''
     list.user_level_id = ''
-    list.nickname = ''
-    list.phone = ''
-    list.email = ''
+    // list.nickname = ''
+    // list.phone = ''
+    // list.email = ''
     list.avatar = ''
     list.status = ''
 }
 
 
 // 搜索功能
-const handlesearch = ()=>{
+const handlesearch = () => {
     // 构建搜索参数
     const val = {
         keyword: searches.value,        // 搜索关键词（用户名）
         user_level_id: searchRegion.value || '',  // 会员等级ID
     }
-    
+
     // 触发父组件的搜索事件
     emits('searchhand', val)
 }
@@ -189,36 +193,48 @@ const handlesearch = ()=>{
 // 重置表单
 const resetForm = () => {
     list.username = ''
-    list.password = ''
+    // list.password = ''
     list.user_level_id = ''
-    list.nickname = ''
-    list.phone = ''
-    list.email = ''
+    // list.nickname = ''
+    // list.phone = ''
+    // list.email = ''
     list.avatar = ''
-    list.status = 1  
-    
+    list.status = 1
+
     // 清除表单
     if (formRef.value) {
         formRef.value.resetFields()
     }
 }
-
 // 打开弹窗
-const opendialog = () =>{
+const opendialog = (type, item = {}) => {
     userlistadd.value = true
+
+    switch (type) {
+        case 1:
+            // 添加管理员
+            title.value = '添加用户'
+            list.value = {}  // 添加时清空
+            break;
+        case 2:
+            // 编辑管理员
+            title.value = '编辑用户'
+            list.value = { ...item }  // 保存当前行数据
+            break;
+    }
 }
 
 
 
-watch(searches,(newVal) =>{
+watch(searches, (newVal) => {
     // 清空搜索框，返回所有数据
-    if(newVal == ''){
+    if (newVal == '') {
         searchRegion.value = ''
         const val = {
-            keyword : '',
-            user_level_id : searches.value || '',
+            keyword: '',
+            user_level_id: searches.value || '',
         }
-        emits('searchhand',val)
+        emits('searchhand', val)
     }
 })
 

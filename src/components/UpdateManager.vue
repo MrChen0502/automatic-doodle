@@ -24,7 +24,7 @@
 
                 <el-form-item label="上传头像" prop="avatar">
                     <!-- 调用图库管理查询显示的结构 -->
-                     <SelectImage v-model="ModelFormData.avatar"/>
+                    <SelectImage v-model="ModelFormData.avatar" />
                 </el-form-item>
 
                 <el-form-item label="账号状态" prop="status" v-show="propTitle === '添加管理员'">
@@ -107,13 +107,12 @@ watch(() => props.propTitle, (newVal) => {
 });
 watch(() => props.propItem, (newVal) => {
     console.log(newVal);
-    if(newVal != null){
+    if (newVal != null) {
         ModelFormData.username = newVal.username //用户名
         ModelFormData.role_id = newVal.role_id   //所属角色ID
         ModelFormData.avatar = newVal.avatar    //头像
         ModelFormData.status = newVal.status    //头像
     }
-
 })
 
 // 初始化修改管理员状态函数
@@ -149,9 +148,10 @@ const AddManageFn = () => {
                 return ElMessage.error(result.msg)
             }
             ElMessage.success('修改成功')
+            // 子组件告知父组件需要重新查询数据
+            emits('updateChild')
         }
-        // 子组件告知父组件需要重新查询数据
-        emits('updateChild')
+
         // 执行关闭对话框操作
         closeChildDiaFn();
         // 进度条(未添加)

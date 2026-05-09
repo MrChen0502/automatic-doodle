@@ -57,7 +57,7 @@
                 <el-pagination :total="total" v-model:current-page="page" @current-change="handleCurrent" />
             </div>
         </el-card>
-        <UpdateManager v-model:propTitle="ParentData.title" :roleList="rolelist" :propItem="currentEditItem" />
+        <UpdateManager v-model:propTitle="ParentData.title" :roleList="rolelist" :propItem="currentEditItem" @updateChild="getDataList"/>
     </div>
 </template>
 
