@@ -26,13 +26,11 @@ export const deleteOrders = (ids) => {
 }
 
 // 导出订单列表
-export const exportOrders = (params = {}) => {
-    const { tab = 'all', ...queryParams } = params
-
+export const exportOrders = (tab, starttime, endtime) => {
     return request({
-        url: `admin/order/excelexport?tab=${tab}`,
+        url: '/admin/order/excelexport',
         method: 'POST',
-        params: queryParams, 
-        responseType: 'blob'
+        responseType: 'blob',
+        params: { tab, starttime, endtime }
     })
 }

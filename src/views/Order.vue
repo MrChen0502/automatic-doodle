@@ -22,7 +22,7 @@
 
             <div class="buttons">
                 <el-button type="danger">批量删除</el-button>
-                <el-button type="primary">导出订单</el-button>
+                <el-button type="primary" @click="handleExportExcel">导出订单</el-button>
             </div>
 
 
@@ -80,12 +80,14 @@ import { Search } from '@element-plus/icons-vue';
 import { getOrder } from '../api/order';
 import { ElMessage } from 'element-plus';
 import OrderDetail from '../components/OrderDetail.vue';
+import { exportOrders } from '../api/order';
 
 
 const activeName = ref('all');
 const shops = ref('');
 const tableData = ref([])
 let page = ref(1);              //当前页码，默认第一页
+
 
 const currentOrder = ref([])
 const isDialog = ref(false)
@@ -114,6 +116,17 @@ const Opdialog = (row) => {
     currentOrder.value = row
     isDialog.value = true
     console.log(row);
+}
+
+
+const handleExportExcel = async () => {
+    let res = await exportOrders(activeName.value)
+    const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = '订单列表.xlsx'
+    a.click()
+    ElMessage.success('导出成功')
 }
 </script>
 
