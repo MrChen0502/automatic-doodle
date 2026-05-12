@@ -37,7 +37,7 @@ import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus';
 import { useStore } from 'vuex';
-import { LoginFn } from '@/api/login';  // ✅ 只导入 LoginFn，不需要导入 getUserInfoFn
+import { LoginFn } from '@/api/login';  //  只导入 LoginFn，不需要导入 getUserInfoFn
 
 const routers = useRouter()
 const loading = ref(false)
@@ -66,7 +66,7 @@ const AdminIndex = (registerFormRef) => {
     if (!registerFormRef) return;
     
     registerFormRef.validate(async (valid) => {
-        if (!valid) return;  // ✅ 验证失败时返回
+        if (!valid) return;  // 验证失败时返回
         
         try {
             loading.value = true;
@@ -77,12 +77,12 @@ const AdminIndex = (registerFormRef) => {
             } else {
                 console.log('登录成功:', result.msg);
                 
-                // ✅ 1. 保存 token
+                //  保存 token
                 window.sessionStorage.setItem('token', result.data.token);
 
                 
                 
-                // ✅ 2. 调用 Vuex action 获取用户信息和统计数据（只调用一次）
+                //  调用 Vuex action 获取用户信息和统计数据（只调用一次）
                 if (result.data.token) {
                     await store.dispatch('ActionGetUserInfo')
                     console.log('用户信息和统计数据已存储到 Vuex')
@@ -93,7 +93,7 @@ const AdminIndex = (registerFormRef) => {
                 
                 ElMessage.success('登录成功')
                 
-                // ✅ 3. 跳转到首页
+                //  跳转到首页
                 routers.push({ name: 'AdminIndex' })
             }
             console.log(result);

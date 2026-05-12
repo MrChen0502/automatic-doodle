@@ -4,7 +4,7 @@
     <div class="userlistsearch">
         <el-input v-model="searches" placeholder="请输入需要搜索的名字" clearable>
             <template #prepend>
-                <el-select v-model="searchRegion" placeholder="请选择会员等级" style="width: 150px">
+                <el-select v-model="searchRegion" placeholder="请选择会员等级" style="width: 150px" clearable>
                     <el-option v-for="(item, index) in gDatas" :key="index" :label="item.name" :value="item.id" />
                 </el-select>
             </template>
@@ -16,67 +16,71 @@
 
     <!-- Dialog对话框——自定义内容 -->
     <div class="userlistadd">
-        <el-button plain @click="opendialog(1)">新增用户</el-button>
+        <el-button plain @click="openDialog(1)">新增用户</el-button>
     </div>
 
-    <el-dialog v-model="userlistadd" :title="title">
+    <!-- 添加/编辑共用的弹窗 -->
+    <el-dialog v-model="userlistadd" :title="title" @close="resetForm">
         <el-form :model="list" :rules="rules" ref="formRef">
             <el-form-item required prop="username" label="用户名字">
                 <el-input v-model="list.username" autocomplete="off" placeholder="请输入用户名字" />
             </el-form-item>
+            <el-form-item required prop="phone" label="用户手机号">
+                <el-input v-model="list.phone" autocomplete="off" placeholder="请输入用户手机号" />
+            </el-form-item>
+            <el-form-item required prop="email" label="用户邮箱">
+                <el-input v-model="list.email" autocomplete="off" placeholder="请输入用户邮箱" />
+            </el-form-item>
+            
+            <!-- 编辑时可以选择不修改密码 -->
+            <el-form-item :required="title === '添加用户'" prop="password" label="密码">
+                <el-input 
+                    v-model="list.password" 
+                    autocomplete="off" 
+                    :placeholder="title === '编辑用户' ? '不修改请留空' : '请输入密码'"
+                    show-password
+                />
+            </el-form-item>
+            
             <el-form-item required prop="user_level_id" label="会员等级">
                 <el-select v-model="list.user_level_id" placeholder="请选择会员等级" style="width: 150px">
                     <el-option v-for="(item, index) in gDatas" :key="index" :label="item.name" :value="item.id" />
                 </el-select>
             </el-form-item>
-            <!-- <el-form-item required prop="password" label="密码">
-                <el-input v-model="list.password" autocomplete="off" placeholder="请输入密码" />
-            </el-form-item>
-            <el-form-item required prop="nickname" label="昵称">
-                <el-input v-model="list.nickname" autocomplete="off" placeholder="请输入昵称" />
-            </el-form-item>
-            <el-form-item required prop="phone" label="电话">
-                <el-input v-model="list.phone" autocomplete="off" placeholder="请输入电话" />
-            </el-form-item>
-            <el-form-item required prop="email" label="邮箱">
-                <el-input v-model="list.email" autocomplete="off" placeholder="请输入邮箱" />
-            </el-form-item> -->
+            
             <el-form-item required prop="status" label="状态">
-                <el-switch v-model="list.status" autocomplete="off" placeholder="请选择状态(0,1)" />
+                <el-switch 
+                    v-model="list.status" 
+                    :active-value="1" 
+                    :inactive-value="0"
+                    active-text="启用"
+                    inactive-text="禁用"
+                />
             </el-form-item>
-            <!-- Upload上传器 -->
+            
+            <!-- 头像上传 -->
             <el-form-item label="头像" prop="avatar">
-                <!-- 调用图库管理查询显示的结构 -->
                 <SelectImage v-model="list.avatar" />
+                <!-- 显示已选择的头像预览 -->
             </el-form-item>
 
         </el-form>
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="userlistadd = false"">取消</el-button>
-                <!-- :disabled=" isDisabled" -->
-                    <el-button type="primary" @click="submitForm">
-                        确认
-                    </el-button>
+                <el-button @click="userlistadd = false">取消</el-button>
+                <el-button type="primary" @click="submitForm">
+                    确认{{ title === '添加用户' ? '添加' : '修改' }}
+                </el-button>
             </div>
         </template>
     </el-dialog>
-
-    <!-- 上传图片对话框 -->
-    <!-- <el-dialog v-model="uploadData.diaUpload" title="上传图片" width="40%">
-        <p>
-            当前图库分类ID:{{ queryData.id }}
-        </p>
-        <UploadCom :data="{ image_class_id: queryData.id }" @uploadadd="uploadaddsuccess" />
-    </el-dialog> -->
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from 'vue';
+import { ref, reactive, watch } from 'vue';
 import { Search } from '@element-plus/icons-vue';
-import { Plus } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
-import { postUserData } from '@/api/user';
+import { postUserData, updateUserData } from '@/api/user';  // 导入编辑API
 import SelectImage from './SelectImage.vue';
 
 const searches = ref('')
@@ -84,7 +88,9 @@ const searchRegion = ref('')
 const userlistadd = ref(false)
 const formRef = ref(null)
 
+// 添加状态管理
 let title = ref('添加用户')
+let editId = ref(null)  // 编辑时的用户ID
 
 const emits = defineEmits(['searchhand']);
 
@@ -93,146 +99,190 @@ const props = defineProps({
     gDatas: Array,
 })
 
+// 表单数据
 const list = reactive({
     username: '',
-    // password: '',
+    password: '',
     user_level_id: '',
-    // nickname: '',
-    // phone: '',
-    // email: '',
+    phone: '',
+    email: '',
     avatar: '',
     status: 1
 })
 
+// 表单验证规则
 const rules = {
     username: [
         { required: true, message: '请输入用户名', trigger: 'blur' }
     ],
-    region: [
-        { required: true, message: '请选择会员等级', trigger: 'change' }
+    phone: [
+        { required: true, message: '请输入手机号', trigger: 'blur' },
+        { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
     ],
-    avatar: [
-        { required: true, message: '请上传头像', trigger: 'change' }
+    email: [
+        { required: true, message: '请输入邮箱', trigger: 'blur' },
+        { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
+    ],
+    user_level_id: [
+        { required: true, message: '请选择会员等级', trigger: 'change' }
     ]
-}
-
-const handleFileChange = (file, fileList) => {
-    // 验证是否是图片
-    if (!file.raw.type.startsWith('image/')) {
-        ElMessage.error('只能上传图片文件！')
-        return
-    }
-}
-
-// 获取当前时间的格式化函数
-const getCurrentTime = () => {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = String(now.getMonth() + 1).padStart(2, '0')
-    const day = String(now.getDate()).padStart(2, '0')
-    const hours = String(now.getHours()).padStart(2, '0')
-    const minutes = String(now.getMinutes()).padStart(2, '0')
-    const seconds = String(now.getSeconds()).padStart(2, '0')
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
 }
 
 // 提交表单
 const submitForm = async () => {
-    // 手动检查必填项
-    if (!list.username) {
-        ElMessage.warning('请输入用户名')
-        return
-    }
+    // 表单验证
+    if (!formRef.value) return
+    
+    await formRef.value.validate(async (valid) => {
+        if (!valid) return
 
+        // 手动检查必填项
+        if (!list.username) {
+            ElMessage.warning('请输入用户名')
+            return
+        }
 
-    const currentTime = getCurrentTime()
-
-    const submitData = {
-        username: list.username,
-        password: list.password,
-        user_level_id: list.user_level_id,
-        nickname: list.nickname,
-        phone: list.phone,
-        email: list.email,
-        avatar: list.avatar,
-        status: list.status
-    }
-
-    console.log('提交的数据：', submitData)
-
-    const result = await postUserData(submitData)
-
-    ElMessage.success('添加成功')
-    userlistadd.value = false
-
-    // 清空表单
-    list.username = ''
-    // list.password = ''
-    list.user_level_id = ''
-    // list.nickname = ''
-    // list.phone = ''
-    // list.email = ''
-    list.avatar = ''
-    list.status = ''
+        try {
+            let result;
+            
+            if (title.value === '添加用户') {
+                // 添加用户
+                if (!list.password) {
+                    ElMessage.warning('请输入密码')
+                    return
+                }
+                
+                const submitData = {
+                    username: list.username,
+                    password: list.password,
+                    user_level_id: list.user_level_id,
+                    phone: list.phone,
+                    email: list.email,
+                    avatar: list.avatar,
+                    status: list.status
+                }
+                
+                console.log('添加用户数据：', submitData)
+                result = await postUserData(submitData)
+                
+            } else {
+                // 编辑用户
+                const submitData = {
+                    username: list.username,
+                    user_level_id: list.user_level_id,
+                    phone: list.phone,
+                    email: list.email,
+                    avatar: list.avatar,
+                    status: list.status
+                }
+                
+                // 只有修改了密码才传递密码字段
+                if (list.password) {
+                    submitData.password = list.password
+                }
+                
+                console.log('编辑用户数据：', submitData)
+                result = await updateUserData(editId.value, submitData)
+            }
+            
+            // 处理返回结果
+            if (result.msg === 'ok' || result.code === 20000) {
+                ElMessage.success(title.value === '添加用户' ? '添加成功' : '修改成功')
+                emits('searchhand')  // 通知父组件刷新列表
+                userlistadd.value = false  // 关闭弹窗
+            } else {
+                ElMessage.error(result.msg || '操作失败')
+            }
+            
+        } catch (error) {
+            console.error('提交失败:', error)
+            ElMessage.error('操作失败，请重试')
+        }
+    })
 }
-
 
 // 搜索功能
 const handlesearch = () => {
-    // 构建搜索参数
     const val = {
-        keyword: searches.value,        // 搜索关键词（用户名）
-        user_level_id: searchRegion.value || '',  // 会员等级ID
+        keyword: searches.value || '',
+        user_level_id: searchRegion.value || '',
     }
-
-    // 触发父组件的搜索事件
     emits('searchhand', val)
 }
 
 // 重置表单
 const resetForm = () => {
     list.username = ''
-    // list.password = ''
+    list.password = ''
     list.user_level_id = ''
-    // list.nickname = ''
-    // list.phone = ''
-    // list.email = ''
+    list.phone = ''
+    list.email = ''
     list.avatar = ''
     list.status = 1
-
-    // 清除表单
+    editId.value = null
+    
+    // 清除表单验证
     if (formRef.value) {
         formRef.value.resetFields()
     }
 }
-// 打开弹窗
-const opendialog = (type, item = {}) => {
-    userlistadd.value = true
 
+// 打开弹窗（添加或编辑）
+const openDialog = (type, item = null) => {
+    resetForm()  // 先重置表单
+    
     switch (type) {
         case 1:
-            // 添加管理员
+            // 添加用户
             title.value = '添加用户'
-            list.value = {}  // 添加时清空
+            editId.value = null
             break;
         case 2:
-            // 编辑管理员
-            title.value = '编辑用户'
-            list.value = { ...item }  // 保存当前行数据
+            // 编辑用户
+            if (item) {
+                title.value = '编辑用户'
+                editId.value = item.id
+                // 填充表单数据
+                list.username = item.username
+                list.user_level_id = item.user_level_id
+                list.phone = item.phone || ''
+                list.email = item.email || ''
+                list.avatar = item.avatar || ''
+                list.status = item.status
+                list.password = ''  
+            }
             break;
     }
+    
+    userlistadd.value = true
 }
 
-
-
+// 搜索
 watch(searches, (newVal) => {
-    // 清空搜索框，返回所有数据
     if (newVal == '') {
         searchRegion.value = ''
         const val = {
             keyword: '',
-            user_level_id: searches.value || '',
+            user_level_id: '',
+        }
+        emits('searchhand', val)
+    }
+})
+// 监听会员等级
+watch(searchRegion, (newVal) => {
+    // 当清空会员等级时
+    if (!newVal) {
+        // 会员等级被清空，回退
+        const val = {
+            keyword: searches.value || '',
+            user_level_id: '',
+        }
+        emits('searchhand', val)
+    } else if (newVal) {
+        // 选择了会员等级，立即搜索
+        const val = {
+            keyword: searches.value || '',
+            user_level_id: newVal,
         }
         emits('searchhand', val)
     }
@@ -244,6 +294,11 @@ watch(userlistadd, (newVal) => {
         resetForm()
     }
 })
+
+// 暴露方法给父组件调用
+defineExpose({
+    openDialog
+})
 </script>
 
 <style scoped>
@@ -253,10 +308,10 @@ watch(userlistadd, (newVal) => {
     margin-left: 20px;
 }
 
-.avatar {
+.avatar-preview {
     width: 100px;
     height: 100px;
-    display: block;
-    object-fit: cover;
+    margin-top: 10px;
+    border-radius: 8px;
 }
 </style>

@@ -13,7 +13,8 @@
                         <!-- 图库分类子组件 -->
                         <PicListAside ref="childFn" @changeid="changeCatelist" />
                         <!-- 图库列表子组件 -->
-                        <PicListMain ref="picmainRef"  @selectImgData="SelectImgFn"/>
+                        <PicListMain ref="picmainRef"  mode="checkbox"  @selectImgData="SelectImgFn"/>
+
                     </el-container>
                 </el-container>
             </el-card>

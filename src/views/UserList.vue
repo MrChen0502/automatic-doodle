@@ -1,7 +1,7 @@
 <template>
     <div class="userlist">
-        <UserListSearch :gDatas="userlevel" @searchhand="getseach" />
-        <UserListtable :gData="userData" />
+        <UserListSearch ref="userSearchRef" :gDatas="userlevel" @searchhand="getseach" />
+        <UserListtable :gData="userData" @deleteuser="getseach"  @editUser="handleEditUser" />
     </div>
 </template>
 
@@ -14,6 +14,13 @@ import { ElMessage } from 'element-plus';
 
 let userData = ref([])
 let userlevel = ref([])
+const userSearchRef = ref(null)
+
+// 处理编辑
+const handleEditUser = (user) => {
+    // 调用子组件的 openDialog 方法打开编辑弹窗
+    userSearchRef.value.openDialog(2, user)
+}
 
 // 搜索处理函数
 const getseach = async (val = {}) => {

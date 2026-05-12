@@ -86,6 +86,18 @@ const routes = [
         meta : { title : '角色管理' },
         name : 'RoleCom',
         component : ()=> import('@/views/RoleCom.vue')
+      },
+      {
+        path : 'comment/list',
+        meta : { title : '订单评论管理' },
+        name : 'Comment',
+        component : ()=> import('@/views/Comment.vue')
+      },
+      {
+        path : 'order/list',
+        meta : { title : '订单管理' },
+        name : 'Order',
+        component : ()=> import('@/views/Order.vue')
       }
     ]
   },

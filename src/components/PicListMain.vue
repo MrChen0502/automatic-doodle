@@ -8,12 +8,14 @@
                             <!-- 图片 -->
                             <el-image fit="cover" :src="item.url" :preview-src-list="[item.url]" />
                             <p>{{ item.name }}</p>
-                            <!-- 操作区:根据当前路由地址判断执行重命名+删除操作还是复选框效果 -->
-                            <div class="pic_edit" v-if="$route.path == '/admin/image/list'">
+                            <!-- 操作区 -->
+                            <div class="pic_edit" v-if="route.path == '/admin/image/list'">
                                 <span @click="openDiaChangePicName(item)">重命名</span>
                                 <span @click="updatePic(item.id)">删除</span>
                             </div>
-                            <div class="pic_edit" v-else-if="$route.path == '/admin/manager/list'">
+                            <!-- 多个路由显示复选框 -->
+                            <div class="pic_edit"
+                                v-else-if="['/admin/manager/list', '/admin/user/list'].includes(route.path)">
                                 <el-checkbox v-model="item.checked" @change="selecetImgFn(item)" />
                             </div>
                         </el-card>
@@ -191,6 +193,7 @@ const getPics = async () => {
     // 根据路由决定是否需要 checked 属性
     switch (route.path) {
         case '/admin/manager/list':
+        case '/admin/user/list':
             data.piclist = result.data.list.map(item => {
                 item.checked = false;
                 return item;
@@ -245,7 +248,7 @@ const selecetImgFn = (val) => {
         // 再把当前这张选中(一次只能选中一张图片)
         val.checked = true
     }
-    emits('selectImgData' , checkedIMG.value)
+    emits('selectImgData', checkedIMG.value)
 }
 
 // 将获取分类ID并请求数据的函数共享给父组件:只要父组件传ID给我的时候，那么直接自动调用请求函数

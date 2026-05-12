@@ -20,3 +20,20 @@ export const postUserData = (data) => {
     })
 }
 
+// 删除用户
+export const deleteUserData = (id) =>{
+    return request({
+        url : `admin/user/${id}/delete`,
+        method : 'POST'
+    })
+}
+
+// 修改用户
+export const updateUserData = (id,data) =>{
+    return request({
+        url : `admin/user/:${id}`,
+        method : POST,
+        data
+    })
+}
+
