@@ -54,8 +54,8 @@ const routes = [
       {
         path: 'skus/list',
         meta: { title: '规格管理' },
-        name: 'SkusList',
-        component: () => import('@/views/SkusList.vue')
+        name: 'SkusCom',
+        component: () => import('@/views/SkusCom.vue')
       },
       {
         path: 'user/list',
@@ -64,40 +64,40 @@ const routes = [
         component: () => import('@/views/UserList.vue'),
       },
       {
-        path : 'image/list',
-        meta : { title : '图库管理' },
-        name : 'PicList',
-        component : ()=> import('@/views/PicList.vue')
+        path: 'image/list',
+        meta: { title: '图库管理' },
+        name: 'PicList',
+        component: () => import('@/views/PicList.vue')
       },
       {
-        path : 'manager/list',
-        meta : { title : '管理员管理' },
-        name : 'ManagerCom',
-        component : ()=> import('@/views/ManagerCom.vue')
+        path: 'manager/list',
+        meta: { title: '管理员管理' },
+        name: 'ManagerCom',
+        component: () => import('@/views/ManagerCom.vue')
       },
       {
-        path : 'access/list',
-        meta : { title : '权限管理' },
-        name : 'RulesCom',
-        component : ()=> import('@/views/RulesCom.vue')
+        path: 'access/list',
+        meta: { title: '权限管理' },
+        name: 'RulesCom',
+        component: () => import('@/views/RulesCom.vue')
       },
       {
-        path : 'role/list',
-        meta : { title : '角色管理' },
-        name : 'RoleCom',
-        component : ()=> import('@/views/RoleCom.vue')
+        path: 'role/list',
+        meta: { title: '角色管理' },
+        name: 'RoleCom',
+        component: () => import('@/views/RoleCom.vue')
       },
       {
-        path : 'comment/list',
-        meta : { title : '订单评论管理' },
-        name : 'Comment',
-        component : ()=> import('@/views/Comment.vue')
+        path: 'comment/list',
+        meta: { title: '订单评论管理' },
+        name: 'Comment',
+        component: () => import('@/views/Comment.vue')
       },
       {
-        path : 'order/list',
-        meta : { title : '订单管理' },
-        name : 'Order',
-        component : ()=> import('@/views/Order.vue')
+        path: 'order/list',
+        meta: { title: '订单管理' },
+        name: 'Order',
+        component: () => import('@/views/Order.vue')
       }
     ]
   },
@@ -120,6 +120,10 @@ const router = createRouter({
 
 // 设置全局路由守卫
 router.beforeEach(async (to, from, next) => {
+  // 先关闭之前的 loading
+  if (lodaingAni) {
+    lodaingAni.close()
+  }
   // 开启进度条
   lodaingAni = ElLoading.service({
     lock: true,

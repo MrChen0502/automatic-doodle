@@ -7,18 +7,23 @@
             </el-col>
             <el-col class="col-right" :lg="8" :md="12" :xs="12" :sm="12">
                 <h2>登录</h2>
-                <el-form class="loginform" :model="FormObj" ref="registerFormRef" :rules="registerRules" @keyup.enter="AdminIndex(registerFormRef)">
+                <el-form class="loginform" :model="FormObj" ref="registerFormRef" :rules="registerRules"
+                    @keyup.enter="AdminIndex(registerFormRef)">
                     <el-form-item prop="username">
                         <el-input placeholder="请输入用户名" v-model="FormObj.username">
                             <template #prefix>
-                                <el-icon><User /></el-icon>
+                                <el-icon>
+                                    <User />
+                                </el-icon>
                             </template>
                         </el-input>
                     </el-form-item>
                     <el-form-item prop="password">
                         <el-input show-password placeholder="请输入密码" v-model="FormObj.password">
                             <template #prefix>
-                                <el-icon><Lock /></el-icon>
+                                <el-icon>
+                                    <Lock />
+                                </el-icon>
                             </template>
                         </el-input>
                     </el-form-item>
@@ -60,41 +65,44 @@ const registerRules = reactive({
 })
 
 const AdminIndex = (registerFormRef) => {
-    console.log('收到的参数:', registerFormRef)
-    console.log('有没有 validate 方法:', typeof registerFormRef?.validate)
+    console.log('点击登录，registerFormRef:', registerFormRef)
+    console.log('FormObj:', FormObj)
 
+    if (!registerFormRef) {
+        console.error('registerFormRef 为 null')
+        return;
+    }
     if (!registerFormRef) return;
-    
+
     registerFormRef.validate(async (valid) => {
         if (!valid) return;  // 验证失败时返回
-        
+
         try {
             loading.value = true;
             let result = await LoginFn(FormObj);
-            
+
             if (result.errorCode) {
                 ElMessage.error(result.msg)
             } else {
                 console.log('登录成功:', result.msg);
-                
+
                 //  保存 token
                 window.sessionStorage.setItem('token', result.data.token);
 
-                
-                
+
+
                 //  调用 Vuex action 获取用户信息和统计数据（只调用一次）
                 if (result.data.token) {
                     await store.dispatch('ActionGetUserInfo')
                     console.log('用户信息和统计数据已存储到 Vuex')
                 }
-                
-                // let info = await getUserInfoFn();
-                // store.commit('insertUserInfoFn', info.data)
-                
+
                 ElMessage.success('登录成功')
-                
+
                 //  跳转到首页
+                setTimeout(() => {
                 routers.push({ name: 'AdminIndex' })
+                },100)
             }
             console.log(result);
         } catch (error) {
@@ -112,9 +120,11 @@ const AdminIndex = (registerFormRef) => {
     width: 100%;
     height: 100%;
 }
+
 .rows {
     height: 100%;
 }
+
 .col-left {
     height: 99vh;
     background-color: #1AA094;
@@ -124,6 +134,7 @@ const AdminIndex = (registerFormRef) => {
     align-items: center;
     flex-direction: column;
 }
+
 .col-right {
     height: 99vh;
     background-color: antiquewhite;
@@ -132,9 +143,11 @@ const AdminIndex = (registerFormRef) => {
     justify-content: center;
     flex-direction: column;
 }
+
 .loginform {
     width: 70%;
 }
+
 .el-button {
     width: 100%;
     background-color: #1AA094;
