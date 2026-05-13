@@ -6,7 +6,7 @@
                 <el-input v-model="SkusFromModel.name"></el-input>
             </el-form-item>
             <el-form-item label="规格数据" prop="default">
-                <el-input v-model="SkusFromModel.default"></el-input>
+                 <Taginput v-model="SkusFromModel.default"/>
             </el-form-item>
             <el-form-item label="排序" prop="order">
                 <el-input-number v-model="SkusFromModel.order" :min="1" :max="1000" />
@@ -26,6 +26,7 @@
 
 <script setup>
 import { ref, watch, reactive } from 'vue';
+import Taginput from './Taginput.vue';
 /********************************************************************* */
 let isDialog = ref(false);      //对话框控制变量
 let SkusFromRef = ref(null);    //表单DOM元素
