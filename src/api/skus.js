@@ -7,7 +7,7 @@ import request from '@/utils/request'
 export const getSkuListFn =(page)=> {
   return request({
     url: `/admin/skus/${page}`,
-    method: 'get'
+    method: 'GET'
   })
 }
 
@@ -17,7 +17,7 @@ export const getSkuListFn =(page)=> {
 export const addSku =(data)=> {
   return request({
     url: '/admin/skus',
-    method: 'post',
+    method: 'POST',
     data
   })
 }
@@ -28,7 +28,7 @@ export const addSku =(data)=> {
 export const updateSku =(id, data)=> {
   return request({
     url: `/admin/skus/${id}`,
-    method: 'post',
+    method: 'POST',
     data
   })
 }
@@ -39,7 +39,7 @@ export const updateSku =(id, data)=> {
 export const deleteSkus =(ids)=> {
   return request({
     url: '/admin/skus/delete_all',
-    method: 'post',
+    method: 'POST',
     data: { ids }
   })
 }
