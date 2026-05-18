@@ -44,7 +44,7 @@
          </div>
     </el-card>
 
-    <UpdateSkus v-model:prop-title="title" :propsItem="item" @successfn="getSkuListFn"/>
+    <UpdateSkus v-model:prop-title="title" :propsItem="item" @successfn="getSkusDataFn"/>
 </template>
 
 <script setup>
