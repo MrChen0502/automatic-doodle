@@ -48,7 +48,7 @@
 
                 <el-table-column prop="total_price" label="实付款" width="80" align="center" />
 
-                <el-table-column prop="" label="购买会员" width="200" align="center">
+                <el-table-column prop="username" label="购买会员" width="200" align="center">
                     <template #default="scope">
                         {{ scope.row.user?.username }}
                     </template>

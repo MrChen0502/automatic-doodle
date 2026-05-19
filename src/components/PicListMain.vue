@@ -14,8 +14,7 @@
                                 <span @click="updatePic(item.id)">删除</span>
                             </div>
                             <!-- 多个路由显示复选框 -->
-                            <div class="pic_edit"
-                                v-else-if="['/admin/manager/list', '/admin/user/list'].includes(route.path)">
+                            <div class="pic_edit" v-else>
                                 <el-checkbox v-model="item.checked" @change="selecetImgFn(item)" />
                             </div>
                         </el-card>
@@ -191,19 +190,28 @@ const getPics = async () => {
     }
 
     // 根据路由决定是否需要 checked 属性
-    switch (route.path) {
-        case '/admin/manager/list':
-        case '/admin/user/list':
-            data.piclist = result.data.list.map(item => {
+    // switch (route.path) {
+    //     case '/admin/manager/list':
+    //     case '/admin/user/list':
+    //         data.piclist = result.data.list.map(item => {
+    //             item.checked = false;
+    //             return item;
+    //         });
+    //         break;
+    //     case '/admin/image/list':
+    //         data.piclist = result.data.list;
+    //         break;
+    //     default:
+    //         data.piclist = result.data.list;
+    // }
+
+    if(route.path == 'admin/image/list'){
+        data.piclist = result.data.list;
+    }else{
+        data.piclist = result.data.list.map(item => {
                 item.checked = false;
                 return item;
             });
-            break;
-        case '/admin/image/list':
-            data.piclist = result.data.list;
-            break;
-        default:
-            data.piclist = result.data.list;
     }
 
     data.total = result.data.totalCount
