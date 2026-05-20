@@ -54,7 +54,7 @@ export const editGoodFn = (id, data) => {
  * id参数 ：商品ID
  * banners参数 ：选中的图片数组
  */
-export const setGoodBannersFn = (id, banners) => {
+export const setGoodBannersFn = (id, data) => {
     return request({
         url: `admin/goods/banners/${id}`,
         method: 'POST',

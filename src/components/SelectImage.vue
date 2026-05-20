@@ -1,9 +1,29 @@
 <template>
     <div class="selectimage">
-        <el-icon class="plusicon" size="40" @click=" isDialog = true">
-            <img v-if="props.modelValue" :src="props.modelValue" class="preview-image" />
+        <!-- 添加图片按钮 -->
+        <el-icon class="addbut" size="40" @click="isDialog = true">
             <Plus />
         </el-icon>
+
+        <!-- modelValue不为空=>展示已选择的图片：modelValue为字符串时，直接显示图片；modelValue是数组循环遍历 -->
+        <main v-if="modelValue">
+            <!-- 单图状态：字符串String -->
+            <el-image v-if="typeof modelValue == 'string'" :src="modelValue" fit="cover" class="plusicon"
+                @click="isDialog = true;" />
+
+            <article v-else>
+                <!-- 多图状态 -->
+                <div class="pic_container" v-for="(item, index) in modelValue" :key="index">
+                    <span @click="deleteimg(index)">X</span>
+                    <el-image class="plusicon" :src="item" fit="cover" />
+                </div>
+            </article>
+        </main>
+
+        <!-- <el-icon class="plusicon" size="40" @click=" isDialog = true">
+            <img v-if="props.modelValue" :src="props.modelValue" class="preview-image" />
+            <Plus />
+        </el-icon> -->
 
         <!-- 对话框 -->
         <el-dialog title="选择图库" width="80%" top="2vh" v-model="isDialog">
@@ -13,14 +33,14 @@
                         <!-- 图库分类子组件 -->
                         <PicListAside ref="childFn" @changeid="changeCatelist" />
                         <!-- 图库列表子组件 -->
-                        <PicListMain ref="picmainRef"  mode="checkbox"  @selectImgData="SelectImgFn"/>
+                        <PicListMain ref="picmainRef" mode="checkbox" @selectImgData="SelectImgFn" />
 
                     </el-container>
                 </el-container>
             </el-card>
             <template #footer>
                 <span class="dislog-footer">
-                    <el-button type="info" plain @click="isDialog=false">取消</el-button>
+                    <el-button type="info" plain @click="isDialog = false">取消</el-button>
                     <el-button type="primary" plain @click="submitImg">确定</el-button>
                 </span>
             </template>
@@ -34,6 +54,7 @@
 import { ref } from 'vue';
 import PicListAside from './PicListAside.vue';
 import PicListMain from './PicListMain.vue';
+import { ElMessage } from 'element-plus';
 
 /********************************************************************* */
 
@@ -41,8 +62,15 @@ let isDialog = ref(false);
 const childFn = ref(null);
 const picmainRef = ref(null);
 let avatarUrl = []
+
+let imgsrc = ref([]);
 const props = defineProps({
-    modelValue : [String , Array]
+    modelValue: [String, Array],
+    // 设置多图选项下最多可以一次添加的最大量，默认最少一张图
+    propnum: {
+        type: Number,
+        default: 1
+    }
 })
 const emits = defineEmits(['update:modelValue'])
 
@@ -55,39 +83,99 @@ const changeCatelist = (cate_id) => {
 }
 
 // 接收子组件传递过来的数据
-const SelectImgFn = (val) =>{
+const SelectImgFn = (val) => {
     console.log(val);
-    avatarUrl = val.map( item => item.url )
-    console.log("地址是："+avatarUrl);
+    avatarUrl = val.map(item => item.url)
+    console.log("地址是：" + avatarUrl);
 }
 
 // 将选中的图片提交给UpdateManager父组件
-const submitImg = () =>{
-    // 修改父组件中v-model绑定的数据，将最近的modelValue传递给父组件
-    if(avatarUrl.length){
-        emits('update:modelValue' , avatarUrl[0]);
+const submitImg = () => {
+    // 判断是多图还是单图模式
+    if (Array.isArray(props.modelValue)) {
+        // 多图模式：累加新图片
+        const newList = [...props.modelValue, ...avatarUrl];
+        // 限制最大数量
+        if (newList.length > props.propnum) {
+            ElMessage.warning(`最多选择${props.propnum}张图片`);
+            return;
+        }
+        emits('update:modelValue', newList);
+    } else {
+        emits('update:modelValue', avatarUrl[0]);
         console.log('提交的图片URL：', avatarUrl[0]);
     }
     console.log(avatarUrl);
     isDialog.value = false;
 }
 
+// 初始化图片
+const deleteimg = (val) => {
+    if (props.modelValue) {
+        const arrList = [...props.modelValue];
+        console.log(arrList);
+        arrList.splice(val, 1)
+        emits('update:modelValue', arrList)
+    }
+}
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .selectimage {
-    width: 150px;
-    height: 100px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px dashed rgb(156, 156, 156);
-    cursor: pointer;
+    .addbut {
+        width: 150px;
+        height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 1px dashed rgb(156, 156, 156);
+        cursor: pointer;
+    }
 
-    .imagecard{
+    article {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-top: 10px;
+        height: 200px;
+        overflow-y: auto;
+
+
+        .pic_container {
+            position: relative;
+
+            span {
+                z-index: 100;
+                width: 25px;
+                height: 25px;
+                position: absolute;
+                right: 10px;
+                top: 5px;
+                border: 1px solid white;
+                background-color: red;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                border-radius: 50%;
+                cursor: pointer;
+            }
+        }
+
+    }
+
+    .imagecard {
         height: 490px;
         padding-top: 20px !important;
         padding-bottom: 20px !important;
+    }
+
+    .plusicon {
+        width: 150px;
+        height: 100px;
+
+
     }
 
 }
