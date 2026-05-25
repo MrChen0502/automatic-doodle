@@ -28,7 +28,7 @@
                 </div>
             </div>
 
-            <el-table :data="tableData" style="width: 100%;" border stripe class="scroll-table"  @selection-change="CheckChange">
+            <el-table :data="tableData" v-loading="isLoading" style="width: 100%;" border stripe class="scroll-table"  @selection-change="CheckChange">
                 <!-- 多选框 -->
                 <el-table-column type="selection" width="40" align="center" />
 
@@ -112,6 +112,8 @@ const tableData = ref([])
 let page = ref(1);              //当前页码，默认第一页
 let ids = ref([])               //初始化删除数组
 
+let isLoading = ref(false);      //设置加载动画
+
 
 
 const currentOrder = ref([])
@@ -125,6 +127,7 @@ const handleClick = (tab) => {
 
 // 查询订单数据
 const getOrdersData = async (no = '') => {
+    isLoading.value = true;
     let result = await getOrder({
         page: page.value,
         tab: activeName.value,
@@ -132,6 +135,7 @@ const getOrdersData = async (no = '') => {
     });
     console.log(no);
     console.log("当前查询到的数据是：", result);
+    isLoading.value = false;
     // 解析结果赋值给 tableData
     if (result.msg != 'ok' || !result.data) return ElMessage.error('错误！！！')
 

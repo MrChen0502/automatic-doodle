@@ -67,7 +67,7 @@ import { ElMessageBox } from 'element-plus';
 import UploadCom from './UploadCom.vue';
 import { useRoute } from 'vue-router';
 
-let isLoading = ref(false)
+let isLoading = ref(false);
 
 
 
@@ -248,14 +248,14 @@ const checkedIMG = computed(() => {
 
 // 当每一个复选框分别触发改变事件时都将进行以下操作：1.判断是否有选中图片；2.是否多选了图片
 const selecetImgFn = (val) => {
-    if (val.checked) {
-        // 先把所有图片取消选中
-        data.piclist.forEach(item => {
-            item.checked = false
-        })
-        // 再把当前这张选中(一次只能选中一张图片)
-        val.checked = true
-    }
+    // if (val.checked) {
+    //     // 先把所有图片取消选中
+    //     data.piclist.forEach(item => {
+    //         item.checked = false
+    //     })
+    //     // 再把当前这张选中(一次只能选中一张图片)
+    //     val.checked = true
+    // }
     emits('selectImgData', checkedIMG.value)
 }
 

@@ -34,7 +34,6 @@
                         <PicListAside ref="childFn" @changeid="changeCatelist" />
                         <!-- 图库列表子组件 -->
                         <PicListMain ref="picmainRef" mode="checkbox" @selectImgData="SelectImgFn" />
-
                     </el-container>
                 </el-container>
             </el-card>
@@ -61,7 +60,9 @@ import { ElMessage } from 'element-plus';
 let isDialog = ref(false);
 const childFn = ref(null);
 const picmainRef = ref(null);
-let avatarUrl = []
+let avatarUrl = [];
+// let arrList = ref([]);
+
 
 let imgsrc = ref([]);
 const props = defineProps({
@@ -94,8 +95,9 @@ const submitImg = () => {
 
 
     // 判断是多图还是单图模式
-    if (Array.isArray(props.modelValue)) {
+    if (props.propnum > 1) {
         // 多图模式：累加新图片
+        // 数组获取原来已存在的图片数组，再获取新添加的图片数组
         const newList = [...props.modelValue, ...avatarUrl];
 
         
@@ -105,7 +107,7 @@ const submitImg = () => {
             return;
         }
         emits('update:modelValue', newList);
-    } else {
+    } else if (props.propnum == 1) {
         emits('update:modelValue', avatarUrl[0]);
         console.log('提交的图片URL：', avatarUrl[0]);
     }
@@ -115,11 +117,18 @@ const submitImg = () => {
 
 // 初始化图片
 const deleteimg = (val) => {
-    if (props.modelValue) {
-        const arrList = [...props.modelValue];
-        console.log(arrList);
-        arrList.splice(val, 1)
-        emits('update:modelValue', arrList)
+    // arrList.value = props.modelValue.filter(item => item != val);
+    // console.log(arrList.value);
+    // arrList.value.splice(val,1)
+    // emits('update:modelValue', arrList.value)
+    if (props.propnum > 1 && Array.isArray(props.modelValue)) {
+        // 直接按索引删除
+        const newList = [...props.modelValue];
+        newList.splice(val, 1);
+        emits('update:modelValue', newList);
+        console.log('删除后的数组:', newList);
+    } else if (props.propnum === 1) {
+        emits('update:modelValue', '');
     }
 }
 </script>
