@@ -17,8 +17,10 @@
                     <!-- 结合插槽，向输入框嵌入一个下拉菜单 -->
                     <el-input placeholder="请输入查询的商品信息" clearable v-model="queryData.title">
                         <template #prepend>
-                            <el-select placeholder="请选择商品分类" style="width: 150px;" clearable v-model="queryData.category_id">
-                                <el-option v-for="item in categoryData" :key="item.id" :label="item.name" :value="item.id" />
+                            <el-select placeholder="请选择商品分类" style="width: 150px;" clearable
+                                v-model="queryData.category_id">
+                                <el-option v-for="item in categoryData" :key="item.id" :label="item.name"
+                                    :value="item.id" />
                             </el-select>
                         </template>
 
@@ -80,8 +82,8 @@
                                 <Edit />
                             </el-icon>
                         </el-button>
-                        <el-button type="info" size="small" plain @click="goodID=scoped.row.id">设置轮播图</el-button>
-                        <el-button type="info" size="small" plain>设置商品详情</el-button>
+                        <el-button type="info" size="small" plain @click="goodID = scoped.row.id">设置轮播图</el-button>
+                        <el-button type="info" size="small" plain @click="infoID = scoped.row.id">设置商品详情</el-button>
                         <el-button type="info" size="small" plain>设置商品规格</el-button>
                     </template>
                 </el-table-column>
@@ -96,20 +98,24 @@
         </el-card>
 
         <!-- 添加/编辑对话框子组件 -->
-        <UpdateGood v-model:prop-title="dia_title"
-        :propCategory="categoryData" @success="getGoodsList" :propArr="editRowData"/>
+        <UpdateGood v-model:prop-title="dia_title" :propCategory="categoryData" @success="getGoodsList"
+            :propArr="editRowData" />
 
         <!-- 设置商品轮播子组件 -->
-         <GoodBanner ref="goodbannerRef" v-model:propID="goodID" />
+        <GoodBanner ref="goodbannerRef" v-model:propID="goodID" />
+
+        <!-- 设置商品详情子组件 -->
+        <GoodInfo ref="goodinfoRef" v-model:propId="infoID"/>
     </div>
 </template>
 
 <script setup>
-import { reactive, ref , watch } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import { getGoodsListFn, getGoodsCategoryFn } from '../api/goods';
 import { ElMessage } from 'element-plus';
 import UpdateGood from '../components/UpdateGood.vue';
 import GoodBanner from '../components/GoodBanner.vue';
+import GoodInfo from '../components/GoodInfo.vue';
 
 
 let tableData = ref([]);        //传递到表格data属性的数据
@@ -129,9 +135,11 @@ let categoryData = ref([]);         //获取商品分类(仅显示状态为true/
 let arr = ref([]);                  //获取商品
 let editRowData = ref(null);
 let dia_title = ref('')             //对话框标题
-let goodID = ref(0);       //商品ID
+let goodID = ref(0);       //轮播商品ID
+let infoID = ref(0);       //详情的商品ID
 
 const goodbannerRef = ref(null);     //获取子组件的DOM元素
+const goodinfoRef = ref(null);       //获取子组件的DOM元素  
 
 /****************************************************************************************** */
 // 初始化获取商品列表函数
@@ -184,8 +192,8 @@ const setGoodsTab = (val) => {
 }
 
 // 监听
-watch(()=>queryData.title,(newVal)=>{
-        if(newVal == ''){
+watch(() => queryData.title, (newVal) => {
+    if (newVal == '') {
         getGoodsList();
     }
 })
@@ -202,7 +210,7 @@ const openAddDialog = () => {
 
 // 打开编辑商品对话框
 const handleEditGood = (row) => {
-    editRowData.value = row; 
+    editRowData.value = row;
     dia_title.value = '';  // 先清空
     setTimeout(() => {
         dia_title.value = '编辑商品';

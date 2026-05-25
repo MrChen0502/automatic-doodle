@@ -64,7 +64,7 @@ export const setGoodBannersFn = (id, data) => {
 
 // 根据商品ID获取商品信息
 /**id参数：商品ID */
-export const getGoodsContentFn = (id) => {
+export const getGoodsMessageFn = (id) => {
     return request({
         url: `admin/goods/read/${id}`,
         method: 'GET'
