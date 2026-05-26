@@ -29,5 +29,6 @@ let inputVisiable = ref(false);
 .inputStyle {
     width: 70px;
     height: 20px;
+    
 }
 </style>
