@@ -89,7 +89,7 @@ export const setGoodContentFn = (id, data) => {
  * id参数：商品ID
  * data参数：表单提交过来的数据
  */
-export const editGoodSkuFn = (id, data) => {
+export const editSkuFn = (id, data) => {
     return request({
         url: `admin/goods/updateskus/${id}`,
         method: 'POST',

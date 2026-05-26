@@ -84,7 +84,7 @@
                         </el-button>
                         <el-button type="info" size="small" plain @click="goodID = scoped.row.id">设置轮播图</el-button>
                         <el-button type="info" size="small" plain @click="infoID = scoped.row.id">设置商品详情</el-button>
-                        <el-button type="info" size="small" plain>设置商品规格</el-button>
+                        <el-button type="info" size="small" plain @click="skuID = scoped.row.id">设置商品规格</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -106,6 +106,9 @@
 
         <!-- 设置商品详情子组件 -->
         <GoodInfo ref="goodinfoRef" v-model:propId="infoID"/>
+
+        <!-- 设置商品规格子组件 -->
+         <GoodsSku v-model:propID="skuID"/>
     </div>
 </template>
 
@@ -116,6 +119,7 @@ import { ElMessage } from 'element-plus';
 import UpdateGood from '../components/UpdateGood.vue';
 import GoodBanner from '../components/GoodBanner.vue';
 import GoodInfo from '../components/GoodInfo.vue';
+import GoodsSku from '../components/GoodsSku.vue';
 
 
 let tableData = ref([]);        //传递到表格data属性的数据
@@ -137,9 +141,11 @@ let editRowData = ref(null);
 let dia_title = ref('')             //对话框标题
 let goodID = ref(0);       //轮播商品ID
 let infoID = ref(0);       //详情的商品ID
+let skuID = ref(0);         
 
 const goodbannerRef = ref(null);     //获取子组件的DOM元素
 const goodinfoRef = ref(null);       //获取子组件的DOM元素  
+
 
 /****************************************************************************************** */
 // 初始化获取商品列表函数
