@@ -29,14 +29,14 @@
                     </el-input-number>
                 </el-form-item>
                 <el-form-item label="重量">
-                    <el-input-number v-model="SkuFormModel.sku_value.weight" contorlos-position="right"
-                        :precision="1" :step="0.1" style="width: 90%;" align="left">
+                    <el-input-number v-model="SkuFormModel.sku_value.weight" contorlos-position="right" :precision="1"
+                        :step="0.1" style="width: 90%;" align="left">
                         <template #suffix>公斤</template>
                     </el-input-number>
                 </el-form-item>
                 <el-form-item label="商品体积">
-                    <el-input-number v-model="SkuFormModel.sku_value.volume" contorlos-position="right"
-                        :precision="1" :step="0.1" style="width: 90%;" align="left">
+                    <el-input-number v-model="SkuFormModel.sku_value.volume" contorlos-position="right" :precision="1"
+                        :step="0.1" style="width: 90%;" align="left">
                         <template #suffix>立方米</template>
                     </el-input-number>
                 </el-form-item>
@@ -63,7 +63,7 @@ import { editSkuFn, getGoodsMessageFn } from '../api/goods';
 import { ElMessage } from 'element-plus';
 import GoodsSkuAdd from './GoodsSkuAdd.vue';
 import GoodsSkuTable from './GoodsSkuTable.vue';
-
+import { goodID, initSkuListFn } from '../api/useSku';
 
 
 let isDialog = ref(false);
@@ -93,10 +93,10 @@ watch(() => props.propID, (newVal) => {
 })
 
 // 初始化提交单规格商品数据
-const editskudatafn = async()=>{
+const editskudatafn = async () => {
     isLoading.value = true;
-    let result = await editSkuFn( props.propID , SkuFormModel )
-    if(result.msg != 'ok' || !result.data)return ElMessage.error(result.msg);
+    let result = await editSkuFn(props.propID, SkuFormModel)
+    if (result.msg != 'ok' || !result.data) return ElMessage.error(result.msg);
 
     isLoading.value = false;
 
@@ -105,26 +105,35 @@ const editskudatafn = async()=>{
 }
 
 // 打开对话框函数
-const OpenDiaolog = async() => {
+const OpenDiaolog = async () => {
+    // 将当前商品ID传给JS文件的变量
+    goodID.value = props.propID;
+
+
     isDialog.value = true;
     isLoading.value = true;
 
-    let result = await getGoodsMessageFn( props.propID )
+    let result = await getGoodsMessageFn(props.propID)
 
     isLoading.value = false;
 
 
-    if(result.msg != 'ok' || !result.data)return ElMessage.error(result.msg);
+    if (result.msg != 'ok' || !result.data) return ElMessage.error(result.msg);
 
     // 向表单赋值
     SkuFormModel.sku_type = result.data.sku_type;
     SkuFormModel.sku_value = result.data.sku_value || {
-        oprice : 0,
-        pprice : 0,
-        cprice : 0,
-        weight : 0,
-        volume : 0
+        oprice: 0,
+        pprice: 0,
+        cprice: 0,
+        weight: 0,
+        volume: 0
     };
+
+
+    console.log('传给 initSkuListFn 的数据:', result.data);
+    // 向useSku.js文件传递商品规格列表
+    initSkuListFn(result.data);
 }
 
 // 关闭对话框函数

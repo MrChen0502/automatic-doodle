@@ -123,7 +123,7 @@ import GoodsSku from '../components/GoodsSku.vue';
 
 
 let tableData = ref([]);        //传递到表格data属性的数据
-let page = ref(1);              //当前页码，默认第一页
+let page = ref(16);              //当前页码，默认第一页
 let total = ref(0);             //总条数
 let tableLoading = ref(false);  //表格加载中
 

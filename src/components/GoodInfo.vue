@@ -4,13 +4,13 @@
             <el-form :model="FormModel">
                 <el-form-item label="编辑商品详情">
                     <!-- 子组件 -->
-                     <wangEditor />
+                     <wangEditor v-model="FormModel.content"/>
                 </el-form-item>
             </el-form>
             <template #footer>
             <span class="dialog-footer">
                 <el-button @click="CloseDialog">取消</el-button>
-                <el-button style="background-color: #1AA094;color: white; ">确定</el-button>
+                <el-button style="background-color: #1AA094;color: white; " @click="setGoodInfofn">确定</el-button>
             </span>
         </template>
         </el-dialog>

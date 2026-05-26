@@ -1,9 +1,9 @@
 <template>
     <div class='wang_editor_com'>
         <Toolbar style="border-bottom: 1px solid #ccc" :editor="editorRef" :defaultConfig="toolbarConfig"
-            :mode="mode" />
+            :mode="props.mode" />
         <Editor style="height: 500px; overflow-y: hidden;" v-model="valueHtml" :defaultConfig="editorConfig"
-            :mode="mode" @onCreated="handleCreated" />
+            :mode="props.mode" @onCreated="handleCreated" />
     </div>
 </template>
 
@@ -25,6 +25,10 @@ const editorConfig = {
 // 接收父组件传递过来的数据
 const props = defineProps({
     modelValue : String,
+    mode : {
+        type : String,
+        default : 'default'
+    }
 })
 // 自定义事件
 const emits = defineEmits(['update:modelValue']);
@@ -54,7 +58,7 @@ const handleCreated = ( editor )=>{
 </script>
 
 <style scoped lang="less">
-wang_deitor_com {
-    border: 1px solid #ccc;
+.wang_editor_com {   // 原来是 wang_deitor_com
+  border: 1px solid #ccc;
 }
 </style>

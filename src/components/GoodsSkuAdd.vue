@@ -1,16 +1,16 @@
 <template>
     <el-form-item label="添加规格">
-        <div class="sku_main">
+        <div class="sku_main" v-for="(item,index) in skuList" :key="index">
             <!-- 顶部：标题 -->
             <div class="sku_top">
                 <span>
-                    <el-button size="samll" type="primary">
+                    <el-button size="small" type="primary">
                         <el-icon>
                             <Delete />
                         </el-icon>
                     </el-button>
                 </span>
-                <el-input class="inputStyle">
+                <el-input class="inputStyle" v-model="item.text">
                     <template #append>
                         <el-button>
                             <el-icon>
@@ -23,7 +23,7 @@
             <!-- 底部：tag标签 -->
             <div class="sku_content">
                 <!-- tag标签的操作子组件 -->
-                <GoodsSkuAddTag></GoodsSkuAddTag>
+                <GoodsSkuAddTag :skuID="item.id"></GoodsSkuAddTag>
             </div>
         </div>
         <el-button type="primary" color="#1AA094" size="small">添加</el-button>
@@ -32,6 +32,7 @@
 
 <script setup>
 import GoodsSkuAddTag from './GoodsSkuAddTag.vue';
+import { skuList } from '../api/useSku';
 </script>
 
 <style scoped lang="less">
