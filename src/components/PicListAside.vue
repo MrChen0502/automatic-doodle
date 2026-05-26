@@ -136,6 +136,7 @@ const handleCurrentPage = (val) => {
 defineExpose({
     getPicCateData,
     clickupdate
+    
 })
 
 </script>
