@@ -92,11 +92,15 @@ const SelectImgFn = (val) => {
 
 // 将选中的图片提交给UpdateManager父组件
 const submitImg = () => {
+
+
     // 判断是多图还是单图模式
     if (props.propnum > 1) {
         // 多图模式：累加新图片
         // 数组获取原来已存在的图片数组，再获取新添加的图片数组
         const newList = [...props.modelValue, ...avatarUrl];
+
+        
         // 限制最大数量
         if (newList.length > props.propnum) {
             ElMessage.warning(`最多选择${props.propnum}张图片`);
