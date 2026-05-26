@@ -1,10 +1,10 @@
 <template>
-    <el-form-item label="添加规格">
+    <el-form-item label="添加规格" v-loading="isLoading">
         <div class="sku_main" v-for="(item,index) in skuList" :key="index">
             <!-- 顶部：标题 -->
             <div class="sku_top">
                 <span>
-                    <el-button size="small" type="primary">
+                    <el-button size="small" type="primary" @click="deleteSku(item.id)">
                         <el-icon>
                             <Delete />
                         </el-icon>
@@ -33,7 +33,7 @@
 
 <script setup>
 import GoodsSkuAddTag from './GoodsSkuAddTag.vue';
-import { skuList , addSku } from '../api/useSku';
+import { skuList , addSku , deleteSku , isLoading } from '../api/useSku';
 </script>
 
 <style scoped lang="less">

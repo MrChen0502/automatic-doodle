@@ -1,12 +1,21 @@
 // 存放所有跟商品有关的数据和方法
 
 import { nextTick, ref } from "vue";
-import { insertGoodSkusValFn, delGoodSkuFn, inertGoodSkusFn } from "./goods";
+import {
+  insertGoodSkusValFn,
+  delGoodSkuFn,
+  inertGoodSkusFn,
+  delGoodSkusFn,
+} from "./goods";
+import ElMessage from "element-plus/es/components/message/index.mjs";
 
 // 导出当前商品ID
 export const goodID = ref(0);
 // 当前商品的规格列表
 export const skuList = ref([]);
+
+// 添加加载状态
+export const isLoading = ref(false);
 
 // 初始化商品规格列表函数
 export function initSkuListFn(goodinfo) {
@@ -99,16 +108,29 @@ export function initSkuItemVal(id) {
 
 // 添加规格（添加一个新的规格行）
 export const addSku = async (parentId = 0) => {
+  const lastItem = skuList.value[skuList.value.length - 1];
+  if (
+    lastItem &&
+    (lastItem.text === "规格名称" || lastItem.text.trim() === "")
+  ) {
+    ElMessage.warning("请先填写规格名称/标签,才能继续添加新的商品规格");
+    return; // 直接返回，不执行新增
+  }
+
+  isLoading.value = true;
+
   // 1. 构造临时数据对象
   let obj = {
     goods_id: goodID.value,
     name: "规格名称",
     order: skuList.value.length + 1,
-    type: 1, 
+    type: 1,
   };
 
   // 2. 调用后端接口插入新的规格
   let result = await inertGoodSkusFn(obj);
+
+  isLoading.value = false;
 
   if (!result.data) return;
 
@@ -119,5 +141,21 @@ export const addSku = async (parentId = 0) => {
     text: result.data.name,
     goodsSkusCardValue: [],
   };
+
   skuList.value.push(newItem);
+};
+
+// 删除规格（删除一个规格行）
+export const deleteSku = async (id) => {
+  isLoading.value = true;
+
+  let result = await delGoodSkusFn(id);
+
+  isLoading.value = false;
+
+  if (result.msg != "ok" || !result.data) return;
+  const index = skuList.value.findIndex((item) => item.id === id);
+  if (index !== -1) {
+    skuList.value.splice(index, 1);
+  }
 };
