@@ -25,14 +25,15 @@
                 <!-- tag标签的操作子组件 -->
                 <GoodsSkuAddTag :skuID="item.id"></GoodsSkuAddTag>
             </div>
+            
         </div>
-        <el-button type="primary" color="#1AA094" size="small">添加</el-button>
+        <el-button type="primary" color="#1AA094" size="small" @click="addSku">添加</el-button>
     </el-form-item>
 </template>
 
 <script setup>
 import GoodsSkuAddTag from './GoodsSkuAddTag.vue';
-import { skuList } from '../api/useSku';
+import { skuList , addSku } from '../api/useSku';
 </script>
 
 <style scoped lang="less">
