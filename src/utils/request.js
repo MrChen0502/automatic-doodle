@@ -39,7 +39,7 @@ instance.interceptors.response.use(response => {
     // 正常数据返回
     return response.data;
 }, err => {
-    // ✅ 方案2：安全返回 + 错误提示
+    // 安全返回 + 错误提示
     if (err.response) {
         // 有响应，返回错误数据
         const message = err.response.data?.message || '请求失败';

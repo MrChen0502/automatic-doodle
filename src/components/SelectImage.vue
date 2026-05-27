@@ -100,7 +100,7 @@ const submitImg = () => {
         // 数组获取原来已存在的图片数组，再获取新添加的图片数组
         const newList = [...props.modelValue, ...avatarUrl];
 
-        
+
         // 限制最大数量
         if (newList.length > props.propnum) {
             ElMessage.warning(`最多选择${props.propnum}张图片`);
@@ -160,19 +160,26 @@ const deleteimg = (val) => {
 
             span {
                 z-index: 100;
-                width: 25px;
-                height: 25px;
+                width: 20px;
+                height: 20px;
                 position: absolute;
-                right: 10px;
-                top: 5px;
-                border: 1px solid white;
-                background-color: red;
+                right: 0;
+                top: 0;
+                border: 1px solid #ddd;
+                background-color: #f0f0f0;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                color: white;
-                border-radius: 50%;
+                color: #666;
                 cursor: pointer;
+                font-size: 10px;
+                transition: all 0.2s;
+            }
+
+            span:hover {
+                background-color: #e0e0e0;
+                color: #333;
+
             }
         }
 

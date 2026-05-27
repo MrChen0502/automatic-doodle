@@ -1,5 +1,5 @@
 <template>
-    <div class="goodsskuaddtag">
+    <div class="goodsskuaddtag" v-loading="Loading">
         <!-- 循环：当前商品具有多规格数据 -->
         <el-tag closable :disable-transitions="false" v-for="(tag, index) in tagList.goodsSkusCardValue" :key="index"
             @close="deleteTag(tag)">
@@ -15,8 +15,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { initSkuItemVal } from '../api/useSku';
+import { initSkuItemVal  } from '../api/useSku';
 
 // 接收父组件传递过来的规格ID
 const props = defineProps({
@@ -27,6 +26,7 @@ const props = defineProps({
 const { tagList,
     inputVisiable,
     inputVal,
+    Loading,
     inputRef,
     InputBlur,
     deleteTag,

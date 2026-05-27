@@ -12,7 +12,7 @@
                 </span>
                 <el-input class="inputStyle" v-model="item.text">
                     <template #append>
-                        <el-button>
+                        <el-button @click="editSkuData(item)">
                             <el-icon>
                                 <Edit />
                             </el-icon>
@@ -33,7 +33,7 @@
 
 <script setup>
 import GoodsSkuAddTag from './GoodsSkuAddTag.vue';
-import { skuList , addSku , deleteSku , isLoading } from '../api/useSku';
+import { skuList , addSku , deleteSku , isLoading , editSkuData } from '../api/useSku';
 </script>
 
 <style scoped lang="less">
