@@ -92,7 +92,7 @@
             <!-- 分页区 -->
             <div class="pageArea">
                 <el-pagination v-model:current-page="page" v-model:page-size="queryData.limit"
-                    :page-sizes="[5, 10, 15, 20]" size="small" layout="sizes, prev, pager, next" :total="total"
+                    :page-sizes="[5, 10, 15, 20, 25, 30, 35, 40]" size="small" layout="sizes, prev, pager, next" :total="total"
                     @current-change="setPage" @size-change="setPagelimit" />
             </div>
         </el-card>

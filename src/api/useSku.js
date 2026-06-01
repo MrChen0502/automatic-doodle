@@ -264,6 +264,9 @@ export function initTableData(){
       {name:'商品重量',row:2},
       {name:'编码',row:2},
     ]
+
+
+    return titleArr
   })
 
   return{
