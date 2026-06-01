@@ -1,6 +1,6 @@
 // 存放所有跟商品有关的数据和方法
 
-import { nextTick, ref } from "vue";
+import { computed, nextTick, ref } from "vue";
 import {
   insertGoodSkusValFn,
   delGoodSkuFn,
@@ -15,6 +15,8 @@ import ElMessage from "element-plus/es/components/message/index.mjs";
 export const goodID = ref(0);
 // 当前商品的规格列表
 export const skuList = ref([]);
+// 定义接收商品已经完成设置的规格数据数组
+export const skuTable = ref([])
 
 // 添加加载状态
 export const isLoading = ref(false);
@@ -34,7 +36,11 @@ export function initSkuListFn(goodinfo) {
     });
     return item;
   });
+  console.log(goodinfo.goodsSkusCard);
+  console.log(goodinfo.goods_skus_card_id);
   console.log(skuList);
+  // 初始化表格数据
+  skuTable.value = goodinfo.goodsSkus;
 }
 
 // 初始化商品规格
@@ -234,3 +240,35 @@ export const editSkuData = async (val)=>{
     isLoading.value = false;
   }
 }
+
+// 初始化规格表格数据(过滤规格选项中空白的数据)
+export function initTableData(){
+  // 如果规格内没有设置属性值，那么不孕系显示在表格内
+  let isSkuVal = computed(()=>{
+    // 将规格数组skuList内goodsSkuCardValue的长度为0的数据过滤掉===>不显示在表格内
+    return skuList.value.filter((item)=> item.goodsSkusCardValue.length != 0)
+  })
+  // 根据goodsSkus的数据，需要重新编辑表格结构
+  let tableTitle = computed(()=>{
+    // 根据有效的规格数组来确定“商品规格”标题需要横向合并多少个单元格
+    let tabLen = isSkuVal.value.length;
+    // 整理列标题
+    let titleArr = [
+      // 如果只有一个规格且只有一个属性（尺码：均码），商品规格只需要保留原标题即可，不需要分裂
+      {name:'商品规格',col:tabLen,row:tabLen>0 ? 1 : 2},
+      {name:'市场价',row:2},
+      {name:'销售价',row:2},
+      {name:'成本价',row:2},
+      {name:'库存',row:2},
+      {name:'商品体积',row:2},
+      {name:'商品重量',row:2},
+      {name:'编码',row:2},
+    ]
+  })
+
+  return{
+    tabLen,
+    titleArr
+  }
+}
+
