@@ -15,7 +15,7 @@
                 </el-tabs>
 
                 <div class="toolbar">
-                    <el-input v-model="shops" placeholder="请输入订单号" clearable @clear="handclear" @keyup.enter="handclear" style="width: 300px;">
+                    <el-input v-model="shops" placeholder="请输入订单号" clearable @clear="handclear" @keyup.enter="handSearch" style="width: 300px;">
                         <template #append>
                             <el-button :icon="Search" @click="handSearch" />
                         </template>
