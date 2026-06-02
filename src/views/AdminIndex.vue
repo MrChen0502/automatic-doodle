@@ -10,7 +10,7 @@
         <el-container>
           <!-- <else-aside :width="$store.state.isCollapse ? '65px' : '200px'"></else-aside> -->
           <el-aside width="200px">
-            <MenuCom></MenuCom>
+            <MenuCom />
           </el-aside>
 
           <el-main>

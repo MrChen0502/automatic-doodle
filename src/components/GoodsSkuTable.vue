@@ -18,7 +18,7 @@
                     <th rowspan="2">编码</th> -->
                 </tr>
                 <tr>
-                    <th  v-for="(item,index) in isSkuVal" :key="index" width="60">
+                    <th  v-for="item in isSkuVal" :key="item.id" width="60">
                         {{ item.name }}
                     </th>
                     <!-- <th width="60">尺寸</th>
@@ -31,7 +31,7 @@
                         {{ val.value }}
                     </td>
                     <!-- <td>L</td>
-                    <td>绿色</td>
+                    <td>绿色</td> -->
                     <td>
                         <input type="number">
                     </td>
@@ -52,7 +52,7 @@
                     </td>
                     <td>
                         <input type="number">
-                    </td> -->
+                    </td>
                 </tr>
             </tbody>
         </table>

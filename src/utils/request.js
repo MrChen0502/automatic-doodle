@@ -11,7 +11,7 @@ const instance = axios.create({
     // 设置项目基准地址(服务器地址)
     baseURL: '/api',
     // 设置请求超时时间为20秒
-    timeout: 30000
+    timeout: 50000
 })
 
 // 设置请求拦截器:将Header属性的token携带拼接到此处

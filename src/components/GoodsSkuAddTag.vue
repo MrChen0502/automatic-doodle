@@ -8,7 +8,7 @@
 
         <!-- 失去焦点、敲击回车键：实现添加tag标签的操作 -->
         <el-input v-if="inputVisiable" class="inputStyle" size="small" v-model="inputVal" ref="inputRef"
-            @blur="InputBlur()" @keyup.enter="InputBlur()"></el-input>
+             @keyup.enter="InputBlur()"></el-input>
 
         <el-button v-else size="small" style="margin-left: 5px;" @click="showInput">+ New Tag</el-button>
     </div>

@@ -21,6 +21,103 @@ export const skuTable = ref([])
 // 添加加载状态
 export const isLoading = ref(false);
 
+// 初始化由Tag标签的增删改查引发的表格数据联动函数（函数不导出，仅在当前文件中使用）
+function getTableDataFn() {
+  // 形成时差：先tag的操作执行完之后，再执行当前函数的内容
+  setTimeout(() => {
+    // 1.先判断规格数组skuList是否有数据
+    if (skuList.length == 0) return skuTable.value = [];
+    // 2.遍历规格数组skuList，将含有tag规格选项（20cm/白色）的数据筛选出来
+    let list = [];
+    // 深拷贝：将一个变量的地址和数据完全克隆赋值给另一个变量，两个变量的地址是独立的
+    skuList.value.forEach(item => {
+      // 判断每个规格内的tag数组是否存在且有数据
+      if (item.goodsSkusCardValue && item.goodsSkusCardValue.length > 0) {
+        list.push(item.goodsSkusCardValue)
+      }
+    })
+    // 经过循环，如果规格内没有tag数组，那么清空表格；有，继续下一步
+    if (list.length == 0) return skuTable.value = [];
+    // 3.定义一个方法：实现排列组合(按照第一个规格内所有tag作为标准顺序，将后续添加的数据归类
+    // ...list:将数组的元素分割成独立的参数，传递给排序函数。list有5个参数；有100个元素，传递100个参数
+    let arr = TagSort(...list);
+    console.log(arr);
+
+    // 针对arr中每个元素里面的两组对象进行重新组合
+    // JSON.parse()：将JSON字符串转换为数组
+    // JSON.stringify(数组)：将数组转换为JSON字符串
+    // JSON.parse(JSON.stringif(数组)):利用转换数据格式的方式将数组数据进行深拷贝
+    let newSkuTable = JSON.parse(JSON.stringify().map(item => {
+      // 判断原来的表格对象是否有数据或者数据是否存在
+      if (!Array.isArray(item.skus)) {
+        item.skus = Object.keys(item.skus), map(val => {
+          return item.skus[val]
+        })
+      } else {
+        // item.skusId = item.skus.sort((num1 , num2)=> num1.id - num2.id)：链式操作的第一阶段实现将第一个规格的第一个tag标签排在表格的第一个单元格
+        // 排序的结果数组.map(val => return val.id):链式操作的第二阶段实现：将排序好的这一行前几个单元格内容id 将其return给新的数组
+        // 获取排序后的tag标签ID数组.join(','):实现数组以逗号，作为连接符合并成字符串 "1394 , 1428 , 1555"
+        item.skusId = item.skus.sort((num1, num2) => num1.id - num2.id).map(val => val.id.json(","))
+        /** 将链式操作拆分
+         * item.skus.sort((num1 , num2)=> num1.id - num2.id)
+         * item.skusId = item.skus.map( val => val.id )
+         * item.skusId = item.skusId.join(',')
+         * 
+         */
+        return item;
+      }
+    }))
+
+    skuTable.value = arr.map(item => {
+      // 将新数据和旧数据传递到其他函数内比较重组
+      let result = skuCompare(JSON.parse(JSON.stringify(item)), newSkuTable)
+      // 4.将转换之后的值赋值给skuTable
+      return {
+        skus: item,
+        image: result.image || null,
+        pprice: result.pprice || "0.00",
+        oprice: result.oprice || "0.00",
+        cprice: result.cprice || "0.00",
+        stock: result.stock || 0,
+        volume: result.volume || 0,
+        weight: result.weight || 0,
+        code: result.code || "",
+        goods_id: goodID.value,
+      }
+    })
+  }, 500)
+}
+
+// 排序方法
+function TagSort() {
+  return Array.prototype.reduce.call(arguments, function (prev, next) {
+    // 接收结果
+    let arr = [];
+    prev.forEach(function (prev) {
+      next.forEach(function (next) {
+        // 将白色的数据分别合并上20cm数据和25cm数据
+        arr.push(prev.concat(next))
+      });
+    })
+    return arr;
+  }, [[]])
+}
+
+// 根据整理好的ID字符串，将arr数组内的元素根据字符串顺序进行重新组合
+function skuCompare(item, newSkuTable) {
+  let itemId = item.sort((num1, num2) => num1.id - num2.id).map(val => val.id).join(',')
+  // 重组比较
+  return newSkuTable.find(k => {
+    // item为新数据
+    if (item.length > k.skus.length) {
+      return itemId.indexOf(k.skusId) != -1
+    } else {
+      // 如果从旧数据中找到被删除的数据，跳过，不需要
+      return k.skusId.indexOf(itemId) != -1
+    }
+  })
+}
+
 // 初始化商品规格列表函数
 export function initSkuListFn(goodinfo) {
   console.log(goodinfo);
@@ -83,6 +180,7 @@ export function initSkuItemVal(id) {
 
     // 添加成功，同步视图数据
     tagList.goodsSkusCardValue.push({ ...result.data, text: inputVal.value });
+    getTableDataFn();
     inputVisiable.value = false;
     inputVal.value = "";
   };
@@ -129,6 +227,7 @@ export function initSkuItemVal(id) {
         return
       }
       tag.value = val;
+      getTableDataFn();
     } finally {
       Loading.value = false;
     }
@@ -214,7 +313,7 @@ export const deleteSku = async (id) => {
 };
 
 // 编辑规格    val参数：整个当前的规格数据
-export const editSkuData = async (val)=>{
+export const editSkuData = async (val) => {
   isLoading.value = true;
   let obj = {
     goods_id: goodID.value,             //商品ID
@@ -222,12 +321,12 @@ export const editSkuData = async (val)=>{
     order: val.order,   //排序
     type: val.type,                           //类型
   };
-  let result = null; 
-  try{
+  let result = null;
+  try {
     // 请求数据
-    result = await editGoodSkusFn( val.id , obj );
+    result = await editGoodSkusFn(val.id, obj);
 
-    if(result.msg != 'ok' || !result.data){
+    if (result.msg != 'ok' || !result.data) {
       val.text = val.name;
       ElMessage.error('修改失败')
       return
@@ -236,42 +335,42 @@ export const editSkuData = async (val)=>{
     // 同步视图
     val.name = val.text
     ElMessage.success('修改成功')
+    getTableDataFn();
   } finally {
     isLoading.value = false;
   }
 }
 
 // 初始化规格表格数据(过滤规格选项中空白的数据)
-export function initTableData(){
+export function initTableData() {
   // 如果规格内没有设置属性值，那么不孕系显示在表格内
-  let isSkuVal = computed(()=>{
+  let isSkuVal = computed(() => {
     // 将规格数组skuList内goodsSkuCardValue的长度为0的数据过滤掉===>不显示在表格内
-    return skuList.value.filter((item)=> item.goodsSkusCardValue.length != 0)
+    return skuList.value.filter((item) => item.goodsSkusCardValue.length != 0)
   })
   // 根据goodsSkus的数据，需要重新编辑表格结构
-  let tableTitle = computed(()=>{
+  let tableTitle = computed(() => {
     // 根据有效的规格数组来确定“商品规格”标题需要横向合并多少个单元格
     let tabLen = isSkuVal.value.length;
     // 整理列标题
     let titleArr = [
       // 如果只有一个规格且只有一个属性（尺码：均码），商品规格只需要保留原标题即可，不需要分裂
-      {name:'商品规格',col:tabLen,row:tabLen>0 ? 1 : 2},
-      {name:'市场价',row:2},
-      {name:'销售价',row:2},
-      {name:'成本价',row:2},
-      {name:'库存',row:2},
-      {name:'商品体积',row:2},
-      {name:'商品重量',row:2},
-      {name:'编码',row:2},
+      { name: '商品规格', col: tabLen, row: tabLen > 0 ? 1 : 2 },
+      { name: '市场价', row: 2 },
+      { name: '销售价', row: 2 },
+      { name: '成本价', row: 2 },
+      { name: '库存', row: 2 },
+      { name: '商品体积', row: 2 },
+      { name: '商品重量', row: 2 },
+      { name: '编码', row: 2 },
     ]
-
-
     return titleArr
   })
 
-  return{
-    tabLen,
-    titleArr
+  return {
+    isSkuVal,
+    tableTitle,
+    skuTable,
   }
 }
 

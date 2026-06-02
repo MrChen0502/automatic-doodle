@@ -3,7 +3,7 @@
         <el-card>
             <el-input placeholder="请输入商品名称" class="comment_input">
                 <template #append>
-                    <el-button @click="handleSearch">
+                    <el-button >
                         <el-icon>
                             <Search />
                         </el-icon>
@@ -18,11 +18,10 @@
                         <span style="font-weight: bold;">用户评论:{{ scope.row?.review?.data }}</span><br />
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span>用户上传的图片分享：</span>
-                            <el-image :src="scope.row?.review?.image" style="width: 50px; height: 50px; cursor: pointer;"
+                            <el-image :src="scope.row?.review?.image[0]" style="width: 50px; height: 50px; cursor: pointer;"
                                 fit="cover" />
                         </div>
-                        <!-- 没写完 -->
-                        <div>用户购买的时间:{{ scope.row.review.review_time }}</div>
+                        <div>用户购买的时间: {{ scope.row?.review_time }}</div>
                         
                     </template>
                 </el-table-column>
@@ -104,6 +103,7 @@ getproduct();
     .pagination {
         display: flex;
         justify-content: center;
+        margin-top: 20px;
     }
 
     .el-table {

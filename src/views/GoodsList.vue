@@ -92,8 +92,8 @@
             <!-- 分页区 -->
             <div class="pageArea">
                 <el-pagination v-model:current-page="page" v-model:page-size="queryData.limit"
-                    :page-sizes="[5, 10, 15, 20, 25, 30, 35, 40]" size="small" layout="sizes, prev, pager, next" :total="total"
-                    @current-change="setPage" @size-change="setPagelimit" />
+                    :page-sizes="[5, 10, 15, 20, 25, 30, 35, 40]" size="small" layout="sizes, prev, pager, next"
+                    :total="total" @current-change="setPage" @size-change="setPagelimit" />
             </div>
         </el-card>
 
@@ -105,10 +105,10 @@
         <GoodBanner ref="goodbannerRef" v-model:propID="goodID" />
 
         <!-- 设置商品详情子组件 -->
-        <GoodInfo ref="goodinfoRef" v-model:propId="infoID"/>
+        <GoodInfo ref="goodinfoRef" v-model:propId="infoID" />
 
         <!-- 设置商品规格子组件 -->
-         <GoodsSku v-model:propID="skuID"/>
+        <GoodsSku v-model:propID="skuID" />
     </div>
 </template>
 
@@ -141,7 +141,7 @@ let editRowData = ref(null);
 let dia_title = ref('')             //对话框标题
 let goodID = ref(0);       //轮播商品ID
 let infoID = ref(0);       //详情的商品ID
-let skuID = ref(0);         
+let skuID = ref(0);
 
 const goodbannerRef = ref(null);     //获取子组件的DOM元素
 const goodinfoRef = ref(null);       //获取子组件的DOM元素  
@@ -151,32 +151,40 @@ const goodinfoRef = ref(null);       //获取子组件的DOM元素
 // 初始化获取商品列表函数
 const getGoodsList = async () => {
     tableLoading.value = true;
-    let result = await getGoodsListFn(page.value, queryData);
-    console.log(result);
 
-    // 不管是否报错，都要关闭加载状态
-    tableLoading.value = false;
+    let result = null
+    try {
+        result = await getGoodsListFn(page.value, queryData);
+        console.log(result);
+        if (result.msg != 'ok' || !result.data) return ElMessage.error(result.msg);
 
-    if (result.msg != 'ok' || !result.data) return ElMessage.error(result.msg);
-
-    // 数据赋值
-    tableData.value = result.data.list
-    total.value = result.data.totalCount;
-
+        // 数据赋值
+        tableData.value = result.data.list
+        total.value = result.data.totalCount;
+    } finally {
+        // 不管是否报错，都要关闭加载状态
+        tableLoading.value = false;
+    }
 }
 getGoodsList();
 
 // 初始化商品分类列表函数
 const getGoodsCategory = async () => {
-    let result = await getGoodsCategoryFn();
-
+    let result = null
+    tableLoading.value=  true;
+    try{
+        //  result = await getGoodsCategoryFn();
     if (result.msg != 'ok' || !result.data) return ElMessage.error(result.msg);
 
     // 筛选出状态为1的分类数据
     categoryData.value = result.data.filter(item => item.status == 1)
     console.log(categoryData.value);
+    }finally{
+        tableLoading.value = false
+    }
+   
 }
-getGoodsCategory();
+// getGoodsCategory();
 
 // 分页查询
 const setPage = (val) => {

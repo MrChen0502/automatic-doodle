@@ -63,7 +63,7 @@ import { editSkuFn, getGoodsMessageFn } from '../api/goods';
 import { ElMessage } from 'element-plus';
 import GoodsSkuAdd from './GoodsSkuAdd.vue';
 import GoodsSkuTable from './GoodsSkuTable.vue';
-import { goodID, initSkuListFn } from '../api/useSku';
+import { goodID, initSkuListFn, skuTable } from '../api/useSku';
 
 
 let isDialog = ref(false);
@@ -95,7 +95,18 @@ watch(() => props.propID, (newVal) => {
 // 初始化提交单规格商品数据
 const editskudatafn = async () => {
     isLoading.value = true;
-    let result = await editSkuFn(props.propID, SkuFormModel)
+
+    let data = {
+        sku_type : SkuFormModel.sku_type,
+        sku_value : SkuFormModel.sku_value
+    }
+
+    // 如果多规格也设置了书恐惧，将其赋值给goodsSKus
+    if( SkuFormModel.sku_type == 1 ){
+        data.goodsSkus = skuTable.value
+    }
+
+    let result = await editSkuFn(props.propID, data)
     if (result.msg != 'ok' || !result.data) return ElMessage.error(result.msg);
 
     isLoading.value = false;
