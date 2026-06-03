@@ -1,6 +1,6 @@
 <template>
     <el-dialog v-model="isDialog" title="设置商品单/多规格" width="60%" destory-on-close @close="CloseDialog">
-        <el-form v-loading="isLoading" :model="SkuFormModel" label-width="120px">
+        <el-form v-loading="isLoading" element-loading-text="正在加载..." :model="SkuFormModel" label-width="120px">
             <el-form-item label="规格类型">
                 <el-radio-group v-model="SkuFormModel.sku_type">
                     <el-radio :value="0" border>单规格</el-radio>
@@ -101,7 +101,7 @@ const editskudatafn = async () => {
         sku_value : SkuFormModel.sku_value
     }
 
-    // 如果多规格也设置了书恐惧，将其赋值给goodsSKus
+    // 如果多规格也设置了数据，将其赋值给goodsSKus
     if( SkuFormModel.sku_type == 1 ){
         data.goodsSkus = skuTable.value
     }

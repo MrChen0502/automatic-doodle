@@ -12,7 +12,7 @@
             </el-input>
 
 
-            <el-table :data="commentList">
+            <el-table :data="commentList" v-loading="isLoading"  element-loading-text="正在加载评论数据...">
                 <el-table-column type="expand">
                     <template #default="scope">
                         <span style="font-weight: bold;">用户评论:{{ scope.row?.review?.data }}</span><br />
@@ -45,7 +45,7 @@
                 <el-table-column label="评价时间" align="center" prop="review_time" />
                 <el-table-column label="是否显示" align="center">
                     <template #default="scope">
-                        <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0" </el-switch>
+                        <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0" />
                     </template>
                 </el-table-column>
             </el-table>
@@ -66,18 +66,28 @@ import { getproductreviews } from '../api/comment';
 import { ElMessage } from 'element-plus';
 
 // 数据
-const loading = ref(false)
+// const loading = ref(false)
+// 评论列表数据（存储后端返回的所有评论）
 const commentList = ref([])
+
+// 总记录数（用于分页组件计算总页数）
 const totalCount = ref(0)
+
+// 当前页码（默认从第1页开始）
 const currentPage = ref(1)
+
+// 每页显示条数（默认每页10条）
 const pageSize = ref(10)
+
+// 搜索关键词（用户输入的商品名称）
 const searchTitle = ref('')
 
+// 加载动画效果
 let isLoading = ref(false)
 
 const getproduct = async () => {
-    loading.value = true;
-
+    // loading.value = true;
+    isLoading.value = true;
     let result = await getproductreviews(currentPage.value, searchTitle.value)
     console.log("打印订单评论数据：", result);
 
@@ -88,9 +98,42 @@ const getproduct = async () => {
     } finally {
         isLoading.value = false;
     }
-
 }
 getproduct();
+
+/**
+ * 分页查询 - 处理页码改变
+ * @param {number} val - 新的页码值（从el-pagination组件传入）
+ * 
+ * 功能说明：
+ * 1. 当用户点击分页器的页码按钮时触发
+ * 2. 更新当前页码为点击的页码
+ * 3. 重新调用getproduct()获取对应页码的数据
+ */
+ const handleCurrentChange = (val) => {
+    currentPage.value = val;  // 更新当前页码
+    getproduct();             // 重新获取数据
+}
+
+/**
+ * 分页查询 - 处理每页显示条数改变
+ * @param {number} val - 新的每页显示条数值（从el-pagination组件传入）
+ * 
+ * 功能说明：
+ * 1. 当用户切换每页显示条数（如从10条切换到20条）时触发
+ * 2. 更新每页显示条数
+ * 3. 重新调用getproduct()获取数据
+ * 
+ * 注意：
+ * - 切换每页条数后，页码会自动重置为第1页（el-pagination组件默认行为）
+ * - 不需要手动重置currentPage，因为el-pagination会自动处理
+ */
+const handleSizeChange = (val) => {
+    pageSize.value = val;     // 更新每页显示条数
+    getproduct();             // 重新获取数据
+}
+
+
 
 </script>
 

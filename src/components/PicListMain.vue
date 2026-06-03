@@ -1,7 +1,7 @@
 <template>
     <div class="main">
         <el-main>
-            <div class="piclistMain" v-loading="isLoading" element-loading-text="加载中 ing...">
+            <div class="piclistMain" v-loading="isLoading"   element-loading-text="正在加载...">
                 <el-row :gutter="20">
                     <el-col :span="6" v-for="item in data.piclist" :key="item.id">
                         <el-card shadow="hover">

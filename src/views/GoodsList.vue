@@ -47,7 +47,7 @@
 
             <!-- 表格 -->
             <el-table :data="tableData" style="margin-bottom: 20px; margin-top: 15px; height: calc(100vh - 340px); "
-                v-loading="tableLoading">
+                v-loading="tableLoading"   element-loading-text="正在加载...">
                 <el-table-column label="商品信息" width="200">
                     <template #default="scoped">
                         <div class="goodinfo">

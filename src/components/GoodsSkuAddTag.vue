@@ -1,5 +1,5 @@
 <template>
-    <div class="goodsskuaddtag" v-loading="Loading">
+    <div class="goodsskuaddtag" v-loading="Loading" element-loading-text="正在加载...">
         <!-- 循环：当前商品具有多规格数据 -->
         <el-tag closable :disable-transitions="false" v-for="(tag, index) in tagList.goodsSkusCardValue" :key="index"
             @close="deleteTag(tag)">

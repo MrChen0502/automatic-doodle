@@ -1,6 +1,6 @@
 <template>
     <el-dialog v-model="isDialog" title="设置轮播图" :title="propTitle" width="40%" destroy-on-close @close="CloseDialog">
-        <el-form :model="FormModel" v-loading="isLoading">
+        <el-form :model="FormModel" v-loading="isLoading" element-loading-text="正在加载...">
             <el-form-item label="轮播图">
                 <!-- 调用图像选择子组件，v-model绑定,如多图状态下，子组件设置限制数量 -->
                 <SelectImage v-model="FormModel.banners" :propnum="5"/>
