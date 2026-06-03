@@ -47,17 +47,17 @@ function getTableDataFn() {
     // JSON.parse()：将JSON字符串转换为数组
     // JSON.stringify(数组)：将数组转换为JSON字符串
     // JSON.parse(JSON.stringif(数组)):利用转换数据格式的方式将数组数据进行深拷贝
-    let newSkuTable = JSON.parse(JSON.stringify().map(item => {
+    let newSkuTable = JSON.parse(JSON.stringify(skuTable.value).map(item => {
       // 判断原来的表格对象是否有数据或者数据是否存在
       if (!Array.isArray(item.skus)) {
-        item.skus = Object.keys(item.skus), map(val => {
+        item.skus = Object.keys(item.skus).map(val => {
           return item.skus[val]
         })
       } else {
         // item.skusId = item.skus.sort((num1 , num2)=> num1.id - num2.id)：链式操作的第一阶段实现将第一个规格的第一个tag标签排在表格的第一个单元格
         // 排序的结果数组.map(val => return val.id):链式操作的第二阶段实现：将排序好的这一行前几个单元格内容id 将其return给新的数组
         // 获取排序后的tag标签ID数组.join(','):实现数组以逗号，作为连接符合并成字符串 "1394 , 1428 , 1555"
-        item.skusId = item.skus.sort((num1, num2) => num1.id - num2.id).map(val => val.id.json(","))
+        item.skusId = item.skus.sort((num1, num2) => num1.id - num2.id).map(val => val.id.join(","))
         /** 将链式操作拆分
          * item.skus.sort((num1 , num2)=> num1.id - num2.id)
          * item.skusId = item.skus.map( val => val.id )

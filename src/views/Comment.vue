@@ -1,9 +1,9 @@
 <template>
     <div>
         <el-card>
-            <el-input placeholder="请输入商品名称" class="comment_input">
+            <el-input placeholder="请输入商品名称" class="comment_input" v-model="searchTitle" clearable>
                 <template #append>
-                    <el-button >
+                    <el-button @click="handSearch">
                         <el-icon>
                             <Search />
                         </el-icon>
@@ -12,17 +12,21 @@
             </el-input>
 
 
-            <el-table :data="commentList" v-loading="isLoading"  element-loading-text="正在加载评论数据...">
-                <el-table-column type="expand">
+            <el-table :data="commentList" v-loading="isLoading" element-loading-text="正在加载数据...">
+                <el-table-column type="expand" @click.stop>
                     <template #default="scope">
-                        <span style="font-weight: bold;">用户评论:{{ scope.row?.review?.data }}</span><br />
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span>用户上传的图片分享：</span>
-                            <el-image :src="scope.row?.review?.image[0]" style="width: 50px; height: 50px; cursor: pointer;"
-                                fit="cover" />
+                        <div v-if="scope.row.status == 1">
+                            <span style="font-weight: bold;">用户评论:{{ scope.row?.review?.data }}</span><br />
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span>用户上传的图片分享：</span>
+                                <el-image :src="scope.row?.review?.image[0]"
+                                    style="width: 50px; height: 50px; cursor: pointer;" fit="cover" />
+                            </div>
+                            <div>用户购买的时间: {{ scope.row?.review_time }}</div>
                         </div>
-                        <div>用户购买的时间: {{ scope.row?.review_time }}</div>
-                        
+                        <div style="color: #999; padding: 10px;" v-else>
+                            该评论已隐藏
+                        </div>
                     </template>
                 </el-table-column>
                 <el-table-column label="商品" align="center">
@@ -61,7 +65,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref , watch } from 'vue';
 import { getproductreviews } from '../api/comment';
 import { ElMessage } from 'element-plus';
 
@@ -84,6 +88,15 @@ const searchTitle = ref('')
 
 // 加载动画效果
 let isLoading = ref(false)
+
+// 监听搜索关键词变化
+watch(searchTitle, (newVal) => {
+    if (newVal === '') {
+        // 搜索框清空时，重置页码并重新加载全部数据
+        currentPage.value = 1;
+        getproduct();
+    }
+})
 
 const getproduct = async () => {
     // loading.value = true;
@@ -110,7 +123,7 @@ getproduct();
  * 2. 更新当前页码为点击的页码
  * 3. 重新调用getproduct()获取对应页码的数据
  */
- const handleCurrentChange = (val) => {
+const handleCurrentChange = (val) => {
     currentPage.value = val;  // 更新当前页码
     getproduct();             // 重新获取数据
 }
@@ -133,12 +146,17 @@ const handleSizeChange = (val) => {
     getproduct();             // 重新获取数据
 }
 
-
-
+// 搜索商品
+const handSearch =()=>{
+    currentPage.value = 1
+    getproduct();
+}
 </script>
 
 <style scoped>
 .el-card {
+    margin-top: 20px;
+
     .comment_input {
         width: 30%;
     }

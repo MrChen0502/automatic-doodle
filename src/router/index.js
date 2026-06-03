@@ -98,6 +98,18 @@ const routes = [
         meta: { title: '订单管理' },
         name: 'Order',
         component: () => import('@/views/Order.vue')
+      },
+      {
+        path : 'distribution/index',
+        meta : { title : '分销员管理' },
+        name: 'Distributor',
+        component: () => import('@/views/Distributor.vue')
+      },
+      {
+        path : 'Distribution/setting',
+        meta : { title : '分销设置' },
+        name: 'Settings',
+        component: () => import('@/views/Settings.vue')
       }
     ]
   },
