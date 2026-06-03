@@ -28,7 +28,7 @@
                 </div>
             </div>
 
-            <el-table :data="tableData" v-loading="isLoading" style="width: 100%;" border stripe class="scroll-table"  @selection-change="CheckChange">
+            <el-table :data="tableData" v-loading="isLoading"   element-loading-text="正在加载..." style="width: 100%;" border stripe class="scroll-table"  @selection-change="CheckChange">
                 <!-- 多选框 -->
                 <el-table-column type="selection" width="40" align="center" />
 
