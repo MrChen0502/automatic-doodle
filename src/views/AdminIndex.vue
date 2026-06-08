@@ -17,13 +17,11 @@
           <!-- 标签栏 -->
           <TagMenus />
           <!-- 路由展示区 -->
-          <el-card>
             <router-view v-slot="{ Component }">
               <keep-alive :max="8">
                 <component :is="Component"></component>
               </keep-alive>
             </router-view>
-          </el-card>
         </el-main>
       </el-container>
     </el-container>
@@ -63,10 +61,5 @@ import TagMenus from '../components/TagMenus.vue';
   height: 100%;
   overflow: hidden;
   background-color: #f2f4f5;
-}
-
-.el-card{
-  margin-top: 15px;
-  height: calc(98vh - 130px);
 }
 </style>

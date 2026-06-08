@@ -1,7 +1,7 @@
 <template>
-    <div class="goodslist">
-        分类管理
-    </div>
+    <el-card>
+        <el-button type="primary"  plain>添加分类</el-button>
+    </el-card>
 </template>
 
 <script>
