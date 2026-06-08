@@ -13,7 +13,7 @@ export const getproductreviews = (page , title)=>{
 }
 
 // 2. 回复/修改商品评价
-export function replyComment(id, data) {
+export const replyComment = (id, data)=> {
     return request({
       url: `/admin/goods_comment/review/${id}`,
       method: 'post',
@@ -22,7 +22,7 @@ export function replyComment(id, data) {
   }
   
   // 3. 是否显示商品评论
-  export function updateCommentStatus(id, status) {
+  export const updateCommentStatus = (id, status)=> {
     return request({
       url: `/admin/goods_comment/${id}/update_status`,
       method: 'post',

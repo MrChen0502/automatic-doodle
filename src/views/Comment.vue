@@ -15,7 +15,9 @@
             <el-table :data="commentList" v-loading="isLoading" element-loading-text="正在加载数据...">
                 <el-table-column type="expand" @click.stop>
                     <template #default="scope">
-                        <div v-if="scope.row.status == 1">
+                        <el-image :src="scope.row?.user?.avatar"
+                            style="width: 50px; border-radius: 50%; margin-left: 50px;" />
+                        <div class="UserComment">
                             <span style="font-weight: bold;">用户评论:{{ scope.row?.review?.data }}</span><br />
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <span>用户上传的图片分享：</span>
@@ -24,8 +26,12 @@
                             </div>
                             <div>用户购买的时间: {{ scope.row?.review_time }}</div>
                         </div>
-                        <div style="color: #999; padding: 10px;" v-else>
-                            该评论已隐藏
+                        <div class="MerchantReply">
+                            <div style="margin-top: 10px;">回复：{{ scope.row?.extra[0]?.data }}</div>
+                            <div @click="openReplyDialog(scope.row.id , scope.row?.extra[0]?.data)"
+                                style="margin-top: 10px; color: rgb(51, 130, 167); cursor: pointer;">
+                                修改
+                            </div>
                         </div>
                     </template>
                 </el-table-column>
@@ -40,7 +46,6 @@
                 <el-table-column label="评分" align="center">
                     <template #default="scope">
                         <span>用户: {{ scope.row?.user?.username }}</span>
-                        <!-- el-rate -->
                         <div>
                             <el-rate v-model="scope.row.rating" disabled show-score />
                         </div>
@@ -60,14 +65,23 @@
                     :page-sizes="[10, 20, 50]" layout="total, sizes, prev, pager, next, jumper"
                     @size-change="handleSizeChange" @current-change="handleCurrentChange" />
             </div>
+
+            <el-dialog title="修改回复" width="400px" v-model="dialogVisible">
+                <template #default>
+                    <el-input placeholder="请输入回复内容" v-model="replyContent" @keyup.enter="updateReply"></el-input>
+                    <el-button @click="dialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="updateReply" >确定</el-button>
+                </template>
+            </el-dialog>
         </el-card>
     </div>
 </template>
 
 <script setup>
-import { ref , watch } from 'vue';
+import { ref, watch } from 'vue';
 import { getproductreviews } from '../api/comment';
 import { ElMessage } from 'element-plus';
+import { replyComment } from '../api/comment';
 
 // 数据
 // const loading = ref(false)
@@ -86,8 +100,16 @@ const pageSize = ref(10)
 // 搜索关键词（用户输入的商品名称）
 const searchTitle = ref('')
 
+// 修改的ID
+const commentId = ref(null);
+
 // 加载动画效果
 let isLoading = ref(false)
+
+// 弹窗相关
+const dialogVisible = ref(false)
+const replyContent = ref('')
+const currentCommentId = ref(null)
 
 // 监听搜索关键词变化
 watch(searchTitle, (newVal) => {
@@ -147,9 +169,43 @@ const handleSizeChange = (val) => {
 }
 
 // 搜索商品
-const handSearch =()=>{
+const handSearch = () => {
     currentPage.value = 1
     getproduct();
+}
+
+// 修改回复
+const updateReply = async () => {
+    isLoading.value = true
+    try {
+        // 这里需要获取用户输入的回复内容
+        // 假设你有一个变量 replyContent
+        // 这里应该从输入框获取
+
+        const result = await replyComment(currentCommentId.value, replyContent.value)
+        console.log(result)
+
+        if (result.msg === 'ok') {
+            ElMessage.success('修改成功！')
+            // 刷新数据
+            getproduct()
+            dialogVisible.value = false;
+        } else {
+            ElMessage.error(result.msg || '修改失败')
+        }
+    } catch (error) {
+        console.error('修改失败：', error)
+        ElMessage.error('网络请求失败')
+    } finally {
+        isLoading.value = false
+    }
+}
+
+const openReplyDialog = (commentId, content)=>{
+    replyContent.value = content
+    currentCommentId.value = commentId
+    dialogVisible.value = true
+    console.log(replyContent.value);
 }
 </script>
 
@@ -170,6 +226,18 @@ const handSearch =()=>{
     .el-table {
         height: calc(100vh - 260px);
 
+        .UserComment {
+            margin-top: -55px;
+            margin-left: 120px;
+        }
+
+        .MerchantReply {
+            padding: 10px;
+            margin-top: 10px;
+            margin-left: 120px;
+            background-color: rgb(194, 194, 194);
+        }
+
         .shops {
             display: flex;
             justify-content: center;
@@ -189,6 +257,12 @@ const handSearch =()=>{
                 align-items: center;
                 cursor: default !important;
             }
+        }
+    }
+
+    .el-dialog{
+        .el-button{
+            
         }
     }
 }
