@@ -1,31 +1,33 @@
 <template>
-    <div class='adminindex'>
-      <!-- 整体页面，默认上下结构 -->
-      <el-container class="container">
-        <el-header>
+  <div class='adminindex'>
+    <!-- 整体页面，默认上下结构 -->
+    <el-container class="container">
+      <el-header>
         <header-com></header-com>
-        </el-header>
+      </el-header>
 
-        <!-- 头部以为的剩余空间结构，默认为左右结构 -->
-        <el-container>
-          <!-- <else-aside :width="$store.state.isCollapse ? '65px' : '200px'"></else-aside> -->
-          <el-aside width="200px">
-            <MenuCom />
-          </el-aside>
+      <!-- 头部以为的剩余空间结构，默认为左右结构 -->
+      <el-container>
+        <!-- <else-aside :width="$store.state.isCollapse ? '65px' : '200px'"></else-aside> -->
+        <el-aside width="200px">
+          <MenuCom />
+        </el-aside>
 
-          <el-main>
-            <!-- 标签栏 -->
-             <TagMenus/>
-             <!-- 路由展示区 -->
+        <el-main>
+          <!-- 标签栏 -->
+          <TagMenus />
+          <!-- 路由展示区 -->
+          <el-card>
             <router-view v-slot="{ Component }">
               <keep-alive :max="8">
                 <component :is="Component"></component>
               </keep-alive>
             </router-view>
-          </el-main>
-        </el-container>
+          </el-card>
+        </el-main>
       </el-container>
-    </div>
+    </el-container>
+  </div>
 </template>
 
 <script setup>
@@ -36,28 +38,35 @@ import TagMenus from '../components/TagMenus.vue';
 </script>
 
 <style scoped>
-.adminindex{
+.adminindex {
   height: 100vh;
-  overflow: hidden;
   /* background-color: palegoldenrod; */
 }
-.container{
+
+.container {
   height: 100%;
   /* background-color: pink; */
   background-color: #1AA094;
 
 }
-.el-header{
+
+.el-header {
   background-color: #1AA094;
 }
-.el-aside{
+
+.el-aside {
   background-color: #1AA094;
 }
-.el-main{
+
+.el-main {
   width: 100%;
-  height: 98vh;
+  height: 100%;
   overflow: hidden;
   background-color: #f2f4f5;
 }
 
+.el-card{
+  margin-top: 15px;
+  height: calc(98vh - 130px);
+}
 </style>
