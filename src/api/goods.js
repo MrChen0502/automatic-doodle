@@ -17,7 +17,7 @@ export const getGoodsListFn = (page, params) => {
         params,
     })
 }
-
+// getGoodsCategoryFn
 // 获取商品分类
 export const getGoodsCategoryFn = () => {
     return request({

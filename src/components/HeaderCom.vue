@@ -18,8 +18,8 @@
              <el-icon :size="20" class="iconright">
                 <FullScreen @click="toggle" />
             </el-icon>
-
             </el-tooltip>
+            
             <!-- 登录者信息+下拉菜单 -->
              <!-- @command事件为下拉菜单的点击事件平替,将触发所绑定 -->
              <el-dropdown @command="commandHandle">
@@ -90,9 +90,6 @@ const {
 const router = useRouter();
 // 拿到公共盒子
 const store = useStore();
-
-// const UserAvatar = ref('https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png');
-// const UserName = ref('Admin');
 
 
 // 点击事件：刷新整个页面，刷新整个应用程序

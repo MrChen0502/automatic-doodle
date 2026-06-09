@@ -57,7 +57,6 @@ const OpenDialog = async () => {
     // 根据商品ID获取商品详情
     let result = await getGoodsMessageFn(props.propId);
 
-        // ✅ 打印结果，查看实际数据结构
        console.log('完整 result:', result);
     console.log('result.data:', result.data);
 

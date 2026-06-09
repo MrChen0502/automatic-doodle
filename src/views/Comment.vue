@@ -178,9 +178,6 @@ const handSearch = () => {
 const updateReply = async () => {
     isLoading.value = true
     try {
-        // 这里需要获取用户输入的回复内容
-        // 假设你有一个变量 replyContent
-        // 这里应该从输入框获取
 
         const result = await replyComment(currentCommentId.value, replyContent.value)
         console.log(result)
@@ -193,10 +190,7 @@ const updateReply = async () => {
         } else {
             ElMessage.error(result.msg || '修改失败')
         }
-    } catch (error) {
-        console.error('修改失败：', error)
-        ElMessage.error('网络请求失败')
-    } finally {
+    }  finally {
         isLoading.value = false
     }
 }

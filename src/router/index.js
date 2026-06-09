@@ -110,6 +110,18 @@ const routes = [
         meta : { title : '分销设置' },
         name: 'Settings',
         component: () => import('@/views/Settings.vue')
+      },
+      {
+        path : 'coupon/list',
+        meta : { title : '优惠券管理' },
+        name: 'Coupon',
+        component: () => import('@/views/Coupon.vue')
+      },
+      {
+        path : 'notice/list',
+        meta : { title : '公告管理' },
+        name: 'NoticeList',
+        component: () => import('@/views/NoticeList.vue')
       }
     ]
   },
