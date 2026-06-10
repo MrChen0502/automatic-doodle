@@ -1,7 +1,10 @@
 <template>
     <div class="userlist">
-        <UserListSearch ref="userSearchRef" :gDatas="userlevel" @searchhand="getseach" />
-        <UserListtable :gData="userData" @deleteuser="getseach"  @editUser="handleEditUser" />
+        <el-card>
+            <UserListSearch ref="userSearchRef" :gDatas="userlevel" @searchhand="getseach" />
+            <UserListtable :gData="userData" :totalCount="totalCount"  @deleteuser="getseach"  @editUser="handleEditUser" :isLoading="isLoading"/>
+        </el-card>
+
     </div>
 </template>
 
@@ -15,6 +18,8 @@ import { ElMessage } from 'element-plus';
 let userData = ref([])
 let userlevel = ref([])
 const userSearchRef = ref(null)
+let totalCount = ref(0)  // 定义总条数
+let isLoading = ref(false)
 
 // 处理编辑
 const handleEditUser = (user) => {
@@ -24,17 +29,19 @@ const handleEditUser = (user) => {
 
 // 搜索处理函数
 const getseach = async (val = {}) => {
-
-    console.log('父组件收到搜索事件！') 
-    console.log('接收到的参数：', val)
-    let result = await getUserData(val)
-
-    if (result.msg != 'ok' || !result.data) {
-        return ElMessage.error(result.msg || '获取数据失败')
+    isLoading.value = true 
+    try {
+        console.log('父组件收到搜索事件！') 
+        let result = await getUserData(val)
+        if (result.msg != 'ok' || !result.data) {
+            return ElMessage.error(result.msg || '获取数据失败')
+        }
+        userData.value = result.data.list
+        userlevel.value = result.data.user_level
+        totalCount.value = result.data.totalCount
+    } finally {
+        isLoading.value = false
     }
-    // 赋值数据
-    userData.value = result.data.list
-    userlevel.value = result.data.user_level
 }
 
 //初始化加载数据
@@ -43,11 +50,8 @@ getseach()
 </script>
 
 <style scoped>
-.userlist {
-    width: 100%;
-    height: 630px;
-    overflow: hidden;
-    overflow-y: scroll;
-    margin-top: 20px;
+.el-card{
+    margin-top: 15px;
+    height: 98vh;
 }
 </style>

@@ -31,8 +31,8 @@ export const deleteUserData = (id) =>{
 // 修改用户
 export const updateUserData = (id,data) =>{
     return request({
-        url : `admin/user/:${id}`,
-        method : POST,
+        url : `admin/user/${id}`,
+        method : 'POST',
         data
     })
 }

@@ -1,23 +1,26 @@
 <!-- 搜索添加 -->
 <template>
     <!-- Input输入框——复合型输入框 -->
-    <div class="userlistsearch">
-        <el-input v-model="searches" placeholder="请输入需要搜索的名字" clearable>
-            <template #prepend>
-                <el-select v-model="searchRegion" placeholder="请选择会员等级" style="width: 150px" clearable>
-                    <el-option v-for="(item, index) in gDatas" :key="index" :label="item.name" :value="item.id" />
-                </el-select>
-            </template>
-            <template #append>
-                <el-button :icon="Search" @click="handlesearch" />
-            </template>
-        </el-input>
+    <div class="flexclass">
+        <div class="userlistsearch">
+            <el-input v-model="searches" placeholder="请输入需要搜索的名字" clearable>
+                <template #prepend>
+                    <el-select v-model="searchRegion" placeholder="请选择会员等级" style="width: 150px" clearable>
+                        <el-option v-for="(item, index) in gDatas" :key="index" :label="item.name" :value="item.id" />
+                    </el-select>
+                </template>
+                <template #append>
+                    <el-button :icon="Search" @click="handlesearch" />
+                </template>
+            </el-input>
+        </div>
+
+        <!-- Dialog对话框——自定义内容 -->
+        <div class="userlistadd">
+            <el-button plain @click="openDialog(1)" type="primary" style="width: 100px;">新增用户</el-button>
+        </div>
     </div>
 
-    <!-- Dialog对话框——自定义内容 -->
-    <div class="userlistadd">
-        <el-button plain @click="openDialog(1)">新增用户</el-button>
-    </div>
 
     <!-- 添加/编辑共用的弹窗 -->
     <el-dialog v-model="userlistadd" :title="title" @close="resetForm">
@@ -31,33 +34,24 @@
             <el-form-item required prop="email" label="用户邮箱">
                 <el-input v-model="list.email" autocomplete="off" placeholder="请输入用户邮箱" />
             </el-form-item>
-            
+
             <!-- 编辑时可以选择不修改密码 -->
             <el-form-item :required="title === '添加用户'" prop="password" label="密码">
-                <el-input 
-                    v-model="list.password" 
-                    autocomplete="off" 
-                    :placeholder="title === '编辑用户' ? '不修改请留空' : '请输入密码'"
-                    show-password
-                />
+                <el-input v-model="list.password" autocomplete="off"
+                    :placeholder="title === '编辑用户' ? '不修改请留空' : '请输入密码'" show-password />
             </el-form-item>
-            
+
             <el-form-item required prop="user_level_id" label="会员等级">
                 <el-select v-model="list.user_level_id" placeholder="请选择会员等级" style="width: 150px">
                     <el-option v-for="(item, index) in gDatas" :key="index" :label="item.name" :value="item.id" />
                 </el-select>
             </el-form-item>
-            
+
             <el-form-item required prop="status" label="状态">
-                <el-switch 
-                    v-model="list.status" 
-                    :active-value="1" 
-                    :inactive-value="0"
-                    active-text="启用"
-                    inactive-text="禁用"
-                />
+                <el-switch v-model="list.status" :active-value="1" :inactive-value="0" active-text="启用"
+                    inactive-text="禁用" />
             </el-form-item>
-            
+
             <!-- 头像上传 -->
             <el-form-item label="头像" prop="avatar">
                 <SelectImage v-model="list.avatar" />
@@ -88,6 +82,7 @@ const searchRegion = ref('')
 const userlistadd = ref(false)
 const formRef = ref(null)
 
+
 // 添加状态管理
 let title = ref('添加用户')
 let editId = ref(null)  // 编辑时的用户ID
@@ -97,6 +92,8 @@ const emits = defineEmits(['searchhand']);
 // 接收父组件数据的变量
 const props = defineProps({
     gDatas: Array,
+    isLoading: Boolean
+
 })
 
 // 表单数据
@@ -132,7 +129,7 @@ const rules = {
 const submitForm = async () => {
     // 表单验证
     if (!formRef.value) return
-    
+
     await formRef.value.validate(async (valid) => {
         if (!valid) return
 
@@ -144,14 +141,13 @@ const submitForm = async () => {
 
         try {
             let result;
-            
             if (title.value === '添加用户') {
                 // 添加用户
                 if (!list.password) {
                     ElMessage.warning('请输入密码')
                     return
                 }
-                
+
                 const submitData = {
                     username: list.username,
                     password: list.password,
@@ -161,10 +157,11 @@ const submitForm = async () => {
                     avatar: list.avatar,
                     status: list.status
                 }
-                
+
                 console.log('添加用户数据：', submitData)
                 result = await postUserData(submitData)
-                
+
+
             } else {
                 // 编辑用户
                 const submitData = {
@@ -175,16 +172,17 @@ const submitForm = async () => {
                     avatar: list.avatar,
                     status: list.status
                 }
-                
+
                 // 只有修改了密码才传递密码字段
                 if (list.password) {
                     submitData.password = list.password
                 }
-                
+
                 console.log('编辑用户数据：', submitData)
                 result = await updateUserData(editId.value, submitData)
+
             }
-            
+
             // 处理返回结果
             if (result.msg === 'ok' || result.code === 20000) {
                 ElMessage.success(title.value === '添加用户' ? '添加成功' : '修改成功')
@@ -193,7 +191,7 @@ const submitForm = async () => {
             } else {
                 ElMessage.error(result.msg || '操作失败')
             }
-            
+
         } catch (error) {
             console.error('提交失败:', error)
             ElMessage.error('操作失败，请重试')
@@ -220,7 +218,7 @@ const resetForm = () => {
     list.avatar = ''
     list.status = 1
     editId.value = null
-    
+
     // 清除表单验证
     if (formRef.value) {
         formRef.value.resetFields()
@@ -230,7 +228,7 @@ const resetForm = () => {
 // 打开弹窗（添加或编辑）
 const openDialog = (type, item = null) => {
     resetForm()  // 先重置表单
-    
+
     switch (type) {
         case 1:
             // 添加用户
@@ -249,11 +247,11 @@ const openDialog = (type, item = null) => {
                 list.email = item.email || ''
                 list.avatar = item.avatar || ''
                 list.status = item.status
-                list.password = ''  
+                list.password = ''
             }
             break;
     }
-    
+
     userlistadd.value = true
 }
 
@@ -302,16 +300,15 @@ defineExpose({
 </script>
 
 <style scoped>
-.userlistsearch {
-    width: 400px;
-    margin-top: 20px;
-    margin-left: 20px;
+.flexclass {
+    display: flex;
+
+    .userlistadd {
+        margin-left: 2%;
+    }
 }
 
-.avatar-preview {
-    width: 100px;
-    height: 100px;
-    margin-top: 10px;
-    border-radius: 8px;
+.userlistsearch {
+    width: 50%;
 }
 </style>

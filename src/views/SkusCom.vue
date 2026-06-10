@@ -8,8 +8,9 @@
 
         <!-- 表格 -->
         <!-- el-table-column 设置type属性为selection,表示第一列为复选框控件；当设置了该属性后，整个表格都将触发选中事件selection-change事件 -->
-        <el-table :data="skuslist" stripe border style="width: 100%;" @selection-change="CheckChange">
-            <el-table-column type="selection" width="50" align="center"/>
+        <el-table :data="skuslist" stripe border style="width: 100%;" @selection-change="CheckChange"
+            v-loading="isLoading">
+            <el-table-column type="selection" width="50" align="center" />
             <el-table-column prop="name" label="规格名称" align="center" />
             <el-table-column prop="default" label="规格数据" align="center" />
             <el-table-column prop="order" label="排序(从大到小)" align="center" />
@@ -25,12 +26,14 @@
             <el-table-column label="操作" align="center">
                 <template #default="scoped">
                     <!-- scoped.row:表示当前行的数据 / 当前正在循环的数据 -->
-                    <el-button type="warning" plain size="small" @click="useDialog('编辑规格' , scoped.row)">
-                        <el-icon><Edit/></el-icon>
+                    <el-button type="warning" plain size="small" @click="useDialog('编辑规格', scoped.row)">
+                        <el-icon>
+                            <Edit />
+                        </el-icon>
                     </el-button>
                     <el-button type="danger" plain size="small" @click="deleteSkuss(scoped.row.id)">
                         <el-icon>
-                            <Delete/>
+                            <Delete />
                         </el-icon>
                     </el-button>
 
@@ -39,12 +42,13 @@
         </el-table>
 
         <!-- 分页 -->
-         <div class="pageArea">
-            <el-pagination size="small" background layout="prev , pager , next" :total="total" v-model:current-page="pages" @current-change="handleCurrentPage"></el-pagination>
-         </div>
+        <div class="pageArea">
+            <el-pagination size="small" background layout="prev , pager , next" :total="total"
+                v-model:current-page="pages" @current-change="handleCurrentPage"></el-pagination>
+        </div>
     </el-card>
 
-    <UpdateSkus v-model:prop-title="title" :propsItem="item" @successfn="getSkusDataFn"/>
+    <UpdateSkus v-model:prop-title="title" :propsItem="item" @successfn="getSkusDataFn" />
 </template>
 
 <script setup>
@@ -60,22 +64,31 @@ let skuslist = ref([]);             //商品规格列表数据
 let title = ref('')                 //对话框标题
 let item = ref({})                  //编辑时传给对话框的数据
 let ids = ref([]);                  //获取被选中的数据规格ID
+
+const isLoading = ref(false);
 /************************************************************************ */
 
 // 初始化查询商品规格列表函数
 const getSkusDataFn = async () => {
-    let result = await getSkuListFn(pages.value);
-    if (result.msg != 'ok' || !result.data) return ElMessage.error(result.msg)
+    isLoading.value = true;
+    let result = null;
+    try {
+        result = await getSkuListFn(pages.value);
+        if (result.msg != 'ok' || !result.data) return ElMessage.error(result.msg)
 
-    // 将请求反馈的数据赋值给当前组件变量
-    skuslist.value = result.data.list;
-    total.value = result.data.totalCount;
+        // 将请求反馈的数据赋值给当前组件变量
+        skuslist.value = result.data.list;
+        total.value = result.data.totalCount;
+    } finally {
+        isLoading.value = false;
+    }
+
 }
 getSkusDataFn();
 
 // 调用对话框
 // text参数：传递给对话框的标题，必填；val参数：在编辑按钮下才会发生传递的数据，可填
-const useDialog = (text , val={})=>{
+const useDialog = (text, val = {}) => {
     title.value = text;
     // 判断：只有在“编辑规格”文本下才进行复制，否则清空
     item.value = text == '编辑规格' ? val : {};
@@ -88,18 +101,18 @@ const handleCurrentPage = (val) => {
 }
 
 // 初始化单条数据删除
-const deleteSkuss = async(id)=>{
-    const isDel = await ElMessageBox.confirm('是否删除数据？' , '删除' , {
-        confirmButtonText : '确定',
-        cancelButtonText : '取消',
-        type : 'warning'
-    }).catch( error => console.log(error) );
+const deleteSkuss = async (id) => {
+    const isDel = await ElMessageBox.confirm('是否删除数据？', '删除', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).catch(error => console.log(error));
 
-    if ( isDel == 'confirm' ){
+    if (isDel == 'confirm') {
         // 执行删除操作
         let result = await deleteSkus([id]);
         console.log(result);
-        if(result.msg != 'ok' || !result.data)return;
+        if (result.msg != 'ok' || !result.data) return;
 
         ElMessage.success('删除成功！！！');
         getSkuListFn();
@@ -107,7 +120,7 @@ const deleteSkuss = async(id)=>{
 }
 
 // 初始化获取表格内复选框的选中数据
-const CheckChange = (arr)=>{
+const CheckChange = (arr) => {
     ids.value = arr.map(item => {
         return item.id
     })
@@ -115,18 +128,22 @@ const CheckChange = (arr)=>{
 }
 
 // 初始化批量删除
-const DeleSkusData = async()=>{
-    let isDel = await ElMessageBox.confirm('是否删除被选中的数据？' , '批量删除' , {
-        confirmButtonText : '删除所选',
-        cancelButtonText : '取消',
-        type : 'warning'
-    }).catch( error => console.log(error) );
+const DeleSkusData = async () => {
+    let isDel = await ElMessageBox.confirm('是否删除被选中的数据？', '批量删除', {
+        confirmButtonText: '删除所选',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).catch(error => console.log(error));
 
-    if(isDel == 'confirm'){
+    if (isDel == 'confirm') {
+        if (ids.value.length == 0) {
+            ElMessage.warning("批量删除数组不能为空，请重试")
+            return
+        }
         // 执行批量删除操作
         let result = await deleteSkus(ids.value)
         console.log(result);
-        if(result.msg != 'ok' || !result.data)return ElMessage.error(result.msg);
+        if (result.msg != 'ok' || !result.data) return ElMessage.error(result.msg);
 
         getSkuListFn();
     }
@@ -134,16 +151,16 @@ const DeleSkusData = async()=>{
 </script>
 
 <style scoped lang="less">
-.skuscom{
+.skuscom {
     margin-top: 20px;
     height: 500px;
 
-    .el-table{
+    .el-table {
         margin-top: 15px;
         margin-bottom: 15px;
     }
 
-    .pageArea{
+    .pageArea {
         height: 50px;
         width: 100%;
         display: flex;

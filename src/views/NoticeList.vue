@@ -61,6 +61,18 @@ const getnoticeList = async () => {
     }
 }
 getnoticeList();
+
+
+const handleSizeChange = (val)=>{
+    pageSize.value = val
+    currentPage.value = 1
+    getnoticeList();
+}
+
+const handleCurrentChange = ()=>{
+    currentPage.value = 1
+    getnoticeList();
+}
 </script>
 
 <style>

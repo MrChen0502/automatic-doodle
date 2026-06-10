@@ -17,7 +17,7 @@
             </el-col>
         </template>
 
-        <el-col :span="3" v-for="item in menuList" :key="item">
+        <el-col :span="3" v-for="(item,index) in menuList" :key="index" @click="gotoNextone(index)">
             <!-- 卡片 -->
             <el-card shadow="hover">
                 <!-- 卡片图标 -->
@@ -36,52 +36,62 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { reactive , ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 // 定义一个响应式常量，存放菜单数据
 const menuList = reactive([
     {
         icon: "Picture",
         title: "图库管理",
-        path: "/image/list"
+        path: "image/list"
     },
     {
         icon: "User",
         title: "管理员管理",
-        path: "/manager/list"
+        path: "manager/list"
     },
     {
         icon: "Shopping-Cart",
         title: "商品管理",
-        path: "/goods/list"
+        path: "goods/list"
     },
     {
         icon: "Tickets",
         title: "订单管理",
-        path: "/order/list"
+        path: "order/list"
     },
     {
         icon: "Star",
         title: "评价管理",
-        path: "/comment/list"
+        path: "comment/list"
     },
     {
         icon: "Edit",
         color: "text-green-500", // 这个颜色类可以在渲染时使用
         title: "公告管理",
-        path: "/notice/list"
+        path: "notice/list"
     },
     {
         icon: "Present",
         title: "优惠券管理",
-        path: "/coupon/list"
+        path: "coupon/list"
     },
     {
         icon: "Setting",
         title: "分销设置",
-        path: "/setting/base"
+        path: "distribution/setting"
     },
 ])
+
+const router = useRouter();
+
+const gotoNextone = (val)=>{
+    const allPaths = menuList.map(item => item.path);
+    console.log(allPaths);
+
+    router.push(allPaths[val])
+}
 </script>
 
 <style scoped>

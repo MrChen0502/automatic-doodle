@@ -7,7 +7,7 @@
             </header>
 
             <!-- 底部 -->
-            <el-tree :data="data" :props="defaultProps" node-key="id" :default-expanded-keys="defaultKey">
+            <el-tree :data="data" :props="defaultProps" node-key="id" :default-expanded-keys="defaultKey" v-loading="isLoading" element-loading-text="加载中ing...">
                 <template #default="{ node, data }">
                     <div class="content">
                         <!-- 左边：权限名称 -->
@@ -17,21 +17,22 @@
                             <el-icon>
                                 <component :is="data.icon"></component>
                             </el-icon>
-                            {{data.name}}
+                            {{ data.name }}
                         </div>
 
                         <!-- 右边：操作按钮+权限开关 -->
                         <div class="right">
-                            <el-switch v-model="data.status" :inactice-value="0" :active-value="1" inactive-text="禁用" active-text="应用"/>
+                            <el-switch v-model="data.status" :inactice-value="0" :active-value="1" inactive-text="禁用"
+                                active-text="应用" />
 
                             <!-- 修改 -->
-                            <el-button type="warning" size="small" plain  @click.stop="openDialog(2 , data)">
+                            <el-button type="warning" size="small" plain @click.stop="openDialog(2, data)">
                                 <el-icon>
-                                    <EditPen/>
+                                    <EditPen />
                                 </el-icon>
                             </el-button>
 
-                            <el-button type="primary" size="small" plain>
+                            <el-button type="primary" size="small" plain @click.stop="openDialog(1)">
                                 <el-icon>
                                     <Plus />
                                 </el-icon>
@@ -49,7 +50,7 @@
         </el-card>
 
         <!-- 调用子组件 -->
-         <UpdateRules v-model:propTitle="isDialog" :menuList="data" @submitok="getRulesList" :propItem="rulesList"/>
+        <UpdateRules v-model:propTitle="isDialog" :menuList="data" @submitok="getRulesList" :propItem="rulesList" />
     </div>
 </template>
 
@@ -66,6 +67,8 @@ const rulesList = ref({})
 // 子节点数据属性指定
 const defaultKey = ref([])
 
+const isLoading = ref(false);
+
 // 树形结构配置
 const defaultProps = {
     children: 'child',
@@ -76,29 +79,36 @@ let isDialog = ref('')
 /*************************************************** */
 
 // 初始化获取菜单权限列表函数
-const getRulesList = async ()=>{
-    let result = await getRulesListFn();
-    if(result.msg != 'ok' || !result.data) return ElMessage.error(result.msg)
+const getRulesList = async () => {
+    isLoading.value = true;
+    let result = null;
+    try {
+        result = await getRulesListFn();
+        if (result.msg != 'ok' || !result.data) return ElMessage.error(result.msg)
 
-    // 保存数据
-    data.value = result.data.list;
-    rulesList.value = result.data.rulesList
-    // 遍历数组，获取所有第一层数组的ID
-    defaultKey.value = result.data.list.map(item=>{
-        return item.id
-    })
-    console.log(defaultKey.value);
+        // 保存数据
+        data.value = result.data.list;
+        rulesList.value = result.data.rulesList
+        // 遍历数组，获取所有第一层数组的ID
+        defaultKey.value = result.data.list.map(item => {
+            return item.id
+        })
+        console.log(defaultKey.value);
+    } finally {
+        isLoading.value = false
+    }
+
 }
 getRulesList();
 
 // 启动对话框
-const openDialog = (type,item = {}) => {
-    if(type == 1){
+const openDialog = (type, item = {}) => {
+    if (type == 1) {
         isDialog.value = '新增';
         rulesList.value = {};
-    }else if(type == 2){
+    } else if (type == 2) {
         isDialog.value = '编辑';
-        rulesList.value = {...item};
+        rulesList.value = { ...item };
     }
 }
 
@@ -114,7 +124,7 @@ const handleDelete = (item) => {
         }
     ).then(async () => {
         const result = await deleteRuleFn(item.id);
-        
+
         if (result.msg === 'ok') {
             ElMessage.success('删除成功');
             getRulesList();  // 重新加载列表
@@ -140,25 +150,25 @@ const handleDelete = (item) => {
         .el-tree {
             margin-top: 20px;
 
-            .content{
+            .content {
                 width: 100%;
                 display: flex;
                 align-items: center;
                 padding-top: 20px;
                 padding-bottom: 20px;
 
-                .left{
+                .left {
                     width: 200px;
                     display: flex;
                     align-content: center;
 
-                    .el-icon{
+                    .el-icon {
                         margin-left: 10px;
                         margin-left: 10px;
                     }
                 }
 
-                .right{
+                .right {
                     margin-left: auto;
                     width: 280px;
                     display: flex;
@@ -166,13 +176,13 @@ const handleDelete = (item) => {
                     align-items: center;
                 }
 
-                .el-switch{
+                .el-switch {
                     margin-right: 13px;
                 }
             }
         }
 
-        :deep(.el-tree-node__content){
+        :deep(.el-tree-node__content) {
             height: 40px;
         }
     }

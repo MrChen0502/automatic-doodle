@@ -106,7 +106,7 @@ const routes = [
         component: () => import('@/views/Distributor.vue')
       },
       {
-        path : 'Distribution/setting',
+        path : 'distribution/setting',
         meta : { title : '分销设置' },
         name: 'Settings',
         component: () => import('@/views/Settings.vue')

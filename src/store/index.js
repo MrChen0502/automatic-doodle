@@ -70,7 +70,7 @@ export default createStore({
             return state.userInfo?.avatar || '默认头像地址'
         }
     },
-    // ✅ 添加持久化插件配置
+    // 添加持久化插件配置
     plugins: [
         createPersistedState({
             key: 'vuex-store',           // localStorage 中存储的键名

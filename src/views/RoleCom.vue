@@ -5,7 +5,7 @@
             <el-button type="primary" size="small" @click="title = '新增角色'">新增</el-button>
 
             <!-- 底部：表格 -->
-            <el-table :data="tableData" stripe border style="width: 100%; height: 450px;">
+            <el-table :data="tableData" stripe border style="width: 100%;">
                 <el-table-column label="角色ID" prop="id"></el-table-column>
                 <el-table-column label="角色名称" prop="name"></el-table-column>
                 <el-table-column label="角色描述" prop="desc"></el-table-column>
@@ -163,4 +163,22 @@ const changeRoleStatus = async (row) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.el-card{
+    height: 98vh;
+}
+.el-table{
+    height: calc(98vh - 260px);
+    margin-top: 20px;
+}
+.pageArea{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+.el-button{
+    width: 100px;
+    height: 30px;
+    border-radius: 10px;
+}
+</style>

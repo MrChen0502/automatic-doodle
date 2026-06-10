@@ -15,7 +15,8 @@
                 </el-tabs>
 
                 <div class="toolbar">
-                    <el-input v-model="shops" placeholder="请输入订单号" clearable @clear="handclear" @keyup.enter="handSearch" style="width: 300px;">
+                    <el-input v-model="shops" placeholder="请输入订单号" clearable @clear="handclear"
+                        @keyup.enter="handSearch" style="width: 300px;">
                         <template #append>
                             <el-button :icon="Search" @click="handSearch" />
                         </template>
@@ -28,7 +29,8 @@
                 </div>
             </div>
 
-            <el-table :data="tableData" v-loading="isLoading"   element-loading-text="正在加载..." style="width: 100%;" border stripe class="scroll-table"  @selection-change="CheckChange">
+            <el-table :data="tableData" v-loading="isLoading" element-loading-text="正在加载..." style="width: 100%;" border
+                stripe class="scroll-table" @selection-change="CheckChange">
                 <!-- 多选框 -->
                 <el-table-column type="selection" width="40" align="center" />
 
@@ -91,6 +93,13 @@
                     </template>
                 </el-table-column>
             </el-table>
+
+            <!-- 分页 -->
+            <div class="pagination">
+                <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :total="totalCount"
+                    :page-sizes="[10, 20, 50, 70, 100]" layout="total, sizes, prev, pager, next, jumper"
+                    @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+            </div>
         </el-card>
 
         <OrderDetail v-model:orderbale="isDialog" :orderData="currentOrder" />
@@ -103,7 +112,7 @@ import { Search } from '@element-plus/icons-vue';
 import { getOrder } from '../api/order';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import OrderDetail from '../components/OrderDetail.vue';
-import { exportOrders , deleteOrders } from '../api/order';
+import { exportOrders, deleteOrders } from '../api/order';
 
 
 const activeName = ref('all');
@@ -113,6 +122,11 @@ let page = ref(1);              //当前页码，默认第一页
 let ids = ref([])               //初始化删除数组
 
 let isLoading = ref(false);      //设置加载动画
+
+// 分页
+let currentPage = ref(1);       //页码
+let pageSize = ref(10);         //每页条数
+let totalCount = ref(0);        //总条数
 
 
 
@@ -131,7 +145,7 @@ const getOrdersData = async (no = '') => {
     let result = await getOrder({
         page: page.value,
         tab: activeName.value,
-        no : no
+        no: no
     });
     console.log(no);
     console.log("当前查询到的数据是：", result);
@@ -140,6 +154,7 @@ const getOrdersData = async (no = '') => {
     if (result.msg != 'ok' || !result.data) return ElMessage.error('错误！！！')
 
     tableData.value = result.data.list
+    totalCount.value = result.data.totalCount
 }
 getOrdersData();
 
@@ -161,20 +176,20 @@ const handleExportExcel = async () => {
 }
 
 // 搜索
-const handSearch = ()=>{
+const handSearch = () => {
     page.value = 1
     getOrdersData(shops.value);
 }
 
 // 清空表单，返回主页面
-const handclear = ()=>{
+const handclear = () => {
     shops.value = ''
     page.value = 1
     getOrdersData();
 }
 
 // 初始化获取表格内复选框的选中数据
-const CheckChange = (arr)=>{
+const CheckChange = (arr) => {
     ids.value = arr.map(item => {
         return item.id
     })
@@ -182,20 +197,20 @@ const CheckChange = (arr)=>{
 }
 
 // 批量删除
-const deleteorders = async()=>{
+const deleteorders = async () => {
 
-    let isDel = await ElMessageBox.confirm('是否删除被选中的数据？' , '批量删除' , {
-        confirmButtonText : '删除所选',
-        cancelButtonText : '取消',
-        type : 'warning'
-    }).catch( error => console.log(error) );
+    let isDel = await ElMessageBox.confirm('是否删除被选中的数据？', '批量删除', {
+        confirmButtonText: '删除所选',
+        cancelButtonText: '取消',
+        type: 'warning'
+    }).catch(error => console.log(error));
 
-    if(isDel == 'confirm'){
+    if (isDel == 'confirm') {
         // 执行批量删除操作
         let result = await deleteOrders(ids.value)
 
         console.log(result);
-        if(result.msg != 'ok' || !result.data)return ElMessage.error(result.msg);
+        if (result.msg != 'ok' || !result.data) return ElMessage.error(result.msg);
 
         getOrdersData();
     }
@@ -210,6 +225,7 @@ const deleteorders = async()=>{
 
     .el-card {
         width: 100%;
+        height: 98vh;
         max-width: 1400px;
         /* 限制最大宽度 */
         margin: 20px auto;
@@ -217,9 +233,7 @@ const deleteorders = async()=>{
 
         .el-table {
             margin-top: 20px;
-            height: calc(100vh - 300px);
-            /* 根据窗口高度自动计算 */
-            overflow-y: auto;
+            height: calc(98vh - 400px);
         }
 
         .buttons {
@@ -227,6 +241,12 @@ const deleteorders = async()=>{
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+        }
+
+        .pagination{
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
         }
     }
 }

@@ -1,38 +1,37 @@
 <!-- 表格 -->
 <template>
-    <el-table :data="gData" style="width: 100%;">
-        <el-table-column label="用户" min-width="120">
+    <el-table :data="gData" style="width: 100%;" stripe v-loading="isLoading">
+        <el-table-column label="用户" min-width="120" align="center">
             <template #default="scope">
-                <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-left: 40px;">
                     <img :src="scope.row.avatar || 'https://example.com/avatar.jpg'" class="avatar" />
                     <span>{{ scope.row.username }}</span>
                 </div>
             </template>
         </el-table-column>
-        <el-table-column label="会员等级" min-width="120">
+        <el-table-column label="会员等级" min-width="120" align="center">
             <template #default="scope">
-                <div style="display: flex; align-items: center">
+                <div>
                     <span style="margin-left: 10px">{{ scope.row.user_level?.name || '未办理会员' }}</span>
                 </div>
             </template>
         </el-table-column>
-        <el-table-column label="注册时间" min-width="150">
+        <el-table-column label="注册时间" min-width="150" align="center">
             <template #default="scope">
-                <div style="display: flex; align-items: center">
+                <div>
                     <span style="margin-left: 10px">{{ scope.row.create_time }}</span>
                 </div>
             </template>
         </el-table-column>
-        <el-table-column label="状态" min-width="120">
+        <el-table-column label="状态" min-width="120" align="center">
             <template #default="scope">
-                <div style="display: flex; align-items: center">
-                    <span style="margin-left: 10px"> <el-switch v-model="scope.row.status" :active-value="1"
-                            :inactive-value="0" @change="handleStatusChange(scope.row)" />
-                    </span>
-                </div>
+                <span style="margin-left: 10px">
+                    <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0"/>
+                    <!-- @change="handleStatusChange(scope.row.id , scope.row.status)"  -->
+                </span>
             </template>
         </el-table-column>
-        <el-table-column label="操作" width="200">
+        <el-table-column label="操作" width="200" align="center">
             <template #default="scope">
                 <el-button type="primary" @click="handleEdit(scope.row)">
                     <el-icon>
@@ -47,35 +46,46 @@
             </template>
         </el-table-column>
     </el-table>
+
+    <!-- 分页 -->
+    <div class="pagination">
+        <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :total="totalCount"
+            :page-sizes="[1, 10, 20, 50, 70, 100]" layout="total, sizes, prev, pager, next, jumper"
+            @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+    </div>
 </template>
 
 <script setup>
 import { Edit, Close } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { deleteUserData } from '../api/user.js';
+import { deleteUserData, updateUserData } from '../api/user.js';
+import { ref } from 'vue';
+
+let currentPage = ref(1)    // 当前页码，默认为1
+let pageSize = ref(10)      // 每页条数，默认为10
+// let totalCount = ref(0)     // 总条数，默认为0
 
 // 接收父组件数据的变量
 const props = defineProps({
     gData: Array, //只接收数组数据
+    isLoading : Boolean,
+    totalCount: Number
 })
 
-const emits = defineEmits(['deleteuser', 'editUser'])  
+const emits = defineEmits(['deleteuser', 'editUser'])
 
 // 状态改变时的处理函数
-const changeStatus = async (row, value) => {
-    console.log(`用户 ${row.username} 状态变为: ${value === 1 ? '启用' : '禁用'}`)
-
-    // 调用API更新状态
+const handleStatus = async (id , newStatus) => {
+    isLoading.value = true;
+    const res = null;
     try {
-        // const res = await updateUserStatus(row.id, { status: value })
-        // if (res.code === 20000) {
-        //     ElMessage.success('状态更新成功')
-        // }
-        ElMessage.success(`状态已${value === 1 ? '启用' : '禁用'}`)
-    } catch (error) {
-        // 如果失败，恢复原状态
-        row.status = value === 1 ? 0 : 1
-        ElMessage.error('状态更新失败')
+        const updateData = {
+            status: newStatus 
+        }
+        res = await updateUserData(Number(id), updateData)
+        if (res.msg != 'ok' || !res.data) ElMessage.error(res.msg)
+    } finally {
+        isLoading.value = false;
     }
 }
 
@@ -97,7 +107,7 @@ const handleDelete = (item) => {
         }
     ).then(async () => {
         console.log("确定删除，用户ID:", item.id);
-        
+
         try {
             // 执行删除操作
             let result = await deleteUserData(item.id)
@@ -130,6 +140,17 @@ const handleDelete = (item) => {
         }
     })
 }
+
+// 
+const handleSizeChange = (val) => {
+    pageSize.value = val
+    currentPage.value = 1
+    emits('deleteuser');
+}
+
+const handleCurrentChange = () => {
+    emits('deleteuser');
+}
 </script>
 
 <style scoped>
@@ -147,5 +168,17 @@ const handleDelete = (item) => {
 
 .Operation {
     cursor: pointer;
+}
+
+.el-table {
+    border: 1px solid rgb(192, 192, 192);
+    margin-top: 15px;
+    height: calc(98vh - 260px);
+}
+
+.pagination {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
 }
 </style>
