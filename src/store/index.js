@@ -54,6 +54,7 @@ export default createStore({
                     }
                     context.commit('insertUserInfoFn', obj)
                     context.commit('insertMenusFn', res.data.menus)
+                    resolve(res.data)
                 }).catch(err => reject(err))
             })
         }

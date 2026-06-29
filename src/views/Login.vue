@@ -42,15 +42,15 @@ import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus';
 import { useStore } from 'vuex';
-import { LoginFn } from '@/api/login';  //  只导入 LoginFn，不需要导入 getUserInfoFn
+import { LoginFn } from '@/api/login';
 
-const routers = useRouter()
+const router = useRouter()
 const loading = ref(false)
 const store = useStore()
 
-let registerFormRef = ref(null)
+const registerFormRef = ref(null)
 
-let FormObj = reactive({
+const FormObj = reactive({
     username: '',
     password: ''
 })
@@ -64,54 +64,50 @@ const registerRules = reactive({
     ]
 })
 
-const AdminIndex = (registerFormRef) => {
-    console.log('点击登录，registerFormRef:', registerFormRef)
-    console.log('FormObj:', FormObj)
+const AdminIndex = async (formRef) => {
+    if (!formRef) return;
 
-    if (!registerFormRef) {
-        console.error('registerFormRef 为 null')
-        return;
-    }
-    if (!registerFormRef) return;
+    try {
+        await formRef.validate(async (valid) => {
+            if (!valid) return;
 
-    registerFormRef.validate(async (valid) => {
-        if (!valid) return;  // 验证失败时返回
-
-        try {
             loading.value = true;
-            let result = await LoginFn(FormObj);
+            const result = await LoginFn(FormObj);
 
             if (result.errorCode) {
-                ElMessage.error(result.msg)
-            } else {
-                console.log('登录成功:', result.msg);
-
-                //  保存 token
-                window.sessionStorage.setItem('token', result.data.token);
-
-
-
-                //  调用 Vuex action 获取用户信息和统计数据（只调用一次）
-                if (result.data.token) {
-                    await store.dispatch('ActionGetUserInfo')
-                    console.log('用户信息和统计数据已存储到 Vuex')
-                }
-
-                ElMessage.success('登录成功')
-
-                //  跳转到首页
-                setTimeout(() => {
-                routers.push({ name: 'AdminIndex' })
-                },100)
+                ElMessage.error(result.msg);
+                return;
             }
-            console.log(result);
-        } catch (error) {
-            console.error('登录失败:', error);
-            ElMessage.error('登录失败，请稍后重试')
-        } finally {
-            loading.value = false;
-        }
-    })
+
+            // 登录成功
+            console.log('=== 登录成功 ===', result.msg);
+            console.log('1. token:', result.data.token);
+            
+            // 保存 token
+            sessionStorage.setItem('token', result.data.token);
+            console.log('2. token 已保存');
+
+            // 获取用户信息
+            if (result.data.token) {
+                console.log('3. 开始获取用户信息');
+                await store.dispatch('ActionGetUserInfo');
+                console.log('4. 用户信息已存储到 Vuex');
+            }
+
+            ElMessage.success('登录成功');
+            console.log('5. 提示消息已显示');
+
+            // 跳转
+            console.log('6. 准备跳转到 AdminIndex');
+            router.push({ name: 'AdminIndex' });
+            console.log('7. 跳转指令已执行');
+        });
+    } catch (error) {
+        console.error('登录失败:', error);
+        ElMessage.error('登录失败，请稍后重试');
+    } finally {
+        loading.value = false;
+    }
 }
 </script>
 
