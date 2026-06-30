@@ -173,7 +173,7 @@ const getGoodsCategory = async () => {
     let result = null
     tableLoading.value=  true;
     try{
-        //  result = await getGoodsCategoryFn();
+         result = await getGoodsCategoryFn();
     if (result.msg != 'ok' || !result.data) return ElMessage.error(result.msg);
 
     // 筛选出状态为1的分类数据
@@ -184,7 +184,7 @@ const getGoodsCategory = async () => {
     }
    
 }
-// getGoodsCategory();
+getGoodsCategory();
 
 // 分页查询
 const setPage = (val) => {
