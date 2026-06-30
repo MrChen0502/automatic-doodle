@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { ref , reactive } from 'vue';
+import { ref, reactive } from 'vue';
 //导入echarts接口的请求函数
 import { getEchartsData } from '@/api/home'
 //导入整个echarts模块并设置别名
@@ -45,7 +45,7 @@ const editCurrent = (val) => {
 
 //当组件的视图template渲染完成之后，将指定的标签作为图标容器，赋值给实例变量
 onMounted(() => {
-    if(mainDom.value){
+    if (mainDom.value) {
         myChart = echarts.init(mainDom.value)
     }
     //调用绘制图表函数并请求数据
@@ -56,25 +56,20 @@ const MakeEcharts = async () => {
     let option = {
         xAxis: {
             type: 'category',
-            data: []
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         },
         yAxis: {
             type: 'value'
         },
         series: [
             {
-                data: [],
-                type: 'bar',
-                //自定义背景样式
-                showBackground: true,
-                backgroundStyle: {
-                    color: "rgba(180,180,180,0.2)"
-                }
+                data: [150, 230, 224, 218, 135, 147, 260],
+                type: 'line'
             }
         ]
     };
     //加载中：当图表还未绘制完成时显示的插件    容器名.showLoading()
-    if(!myChart)return;
+    if (!myChart) return;
     myChart.showLoading();
     //请求数据
     let result = await getEchartsData(currentTag.value)
@@ -125,7 +120,7 @@ onBeforeUnmount(() => {
 
     .t_main {
         width: 100%;
-        height: 330px;
+        height: 315px;
     }
 }
 </style>

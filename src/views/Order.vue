@@ -216,6 +216,16 @@ const deleteorders = async () => {
     }
 }
 
+const handleSizeChange = (val) => {
+    pageSize.value = val;
+    page.value = 1; // 切换每页条数时，重置为第一页
+    getOrdersData();
+}
+
+const handleCurrentChange = (val) => {
+    page.value = val;
+    getOrdersData();
+}
 
 </script>
 

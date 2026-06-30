@@ -1,7 +1,7 @@
 <template>
     <div class="main">
         <el-main>
-            <div class="piclistMain" v-loading="isLoading"   element-loading-text="正在加载...">
+            <div class="piclistMain" v-loading="isLoading" element-loading-text="正在加载...">
                 <el-row :gutter="20">
                     <el-col :span="6" v-for="item in data.piclist" :key="item.id">
                         <el-card shadow="hover">
@@ -69,7 +69,13 @@ import { useRoute } from 'vue-router';
 
 let isLoading = ref(false);
 
-
+const props = defineProps({
+    modelValue: [String, Array],
+    propnum: {
+        type: Number,
+        default: 1
+    }
+})
 
 // 定义接口参数的对象集合
 const queryData = reactive({
@@ -189,29 +195,13 @@ const getPics = async () => {
         return
     }
 
-    // 根据路由决定是否需要 checked 属性
-    // switch (route.path) {
-    //     case '/admin/manager/list':
-    //     case '/admin/user/list':
-    //         data.piclist = result.data.list.map(item => {
-    //             item.checked = false;
-    //             return item;
-    //         });
-    //         break;
-    //     case '/admin/image/list':
-    //         data.piclist = result.data.list;
-    //         break;
-    //     default:
-    //         data.piclist = result.data.list;
-    // }
-
-    if(route.path == 'admin/image/list'){
+    if (route.path == 'admin/image/list') {
         data.piclist = result.data.list;
-    }else{
+    } else {
         data.piclist = result.data.list.map(item => {
-                item.checked = false;
-                return item;
-            });
+            item.checked = false;
+            return item;
+        });
     }
 
     data.total = result.data.totalCount
@@ -246,17 +236,27 @@ const checkedIMG = computed(() => {
     return data.piclist.filter(item => item.checked)
 })
 
-// 当每一个复选框分别触发改变事件时都将进行以下操作：1.判断是否有选中图片；2.是否多选了图片
+// 当每一个复选框分别触发改变事件时都将进行以下操作：1.判断是否有选中图片；2.是否多选了图片 3.判断是单选还是多选
 const selecetImgFn = (val) => {
-    // if (val.checked) {
-    //     // 先把所有图片取消选中
-    //     data.piclist.forEach(item => {
-    //         item.checked = false
-    //     })
-    //     // 再把当前这张选中(一次只能选中一张图片)
-    //     val.checked = true
-    // }
-    emits('selectImgData', checkedIMG.value)
+    // 多图模式：直接切换选中状态
+    if (props.propnum > 1) {
+        val.checked = !val.checked;
+        
+        // 检查数量限制
+        const checkedCount = data.piclist.filter(item => item.checked).length;
+        if (checkedCount > props.propnum) {
+            val.checked = false;
+            ElMessage.warning(`最多选择${props.propnum}张图片`);
+            return;
+        }
+    } else {
+        // 单图模式：互斥选择
+        data.piclist.forEach(item => item.checked = false);
+        val.checked = true;
+    }
+    
+    // 触发事件
+    emits('selectImgData', checkedIMG.value);
 }
 
 // 将获取分类ID并请求数据的函数共享给父组件:只要父组件传ID给我的时候，那么直接自动调用请求函数

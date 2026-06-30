@@ -60,6 +60,7 @@ const props = defineProps({
         line-height: 25px;
         cursor: pointer;
         margin-top: 10px;
+        height: 100px;
         span {
             display: block;
             font-family: 800;

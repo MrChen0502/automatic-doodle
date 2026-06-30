@@ -20,11 +20,6 @@
             </article>
         </main>
 
-        <!-- <el-icon class="plusicon" size="40" @click=" isDialog = true">
-            <img v-if="props.modelValue" :src="props.modelValue" class="preview-image" />
-            <Plus />
-        </el-icon> -->
-
         <!-- 对话框 -->
         <el-dialog title="选择图库" width="80%" top="2vh" v-model="isDialog">
             <el-card class="imagecard">
@@ -92,8 +87,6 @@ const SelectImgFn = (val) => {
 
 // 将选中的图片提交给UpdateManager父组件
 const submitImg = () => {
-
-
     // 判断是多图还是单图模式
     if (props.propnum > 1) {
         // 多图模式：累加新图片
@@ -117,10 +110,6 @@ const submitImg = () => {
 
 // 初始化图片
 const deleteimg = (val) => {
-    // arrList.value = props.modelValue.filter(item => item != val);
-    // console.log(arrList.value);
-    // arrList.value.splice(val,1)
-    // emits('update:modelValue', arrList.value)
     if (props.propnum > 1 && Array.isArray(props.modelValue)) {
         // 直接按索引删除
         const newList = [...props.modelValue];

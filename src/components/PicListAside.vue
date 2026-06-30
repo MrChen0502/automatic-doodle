@@ -102,14 +102,6 @@ const deletePics = async (val) => {
     }
 }
 
-// const changeCateID = (id) => {
-//     //修改默认选中的数据
-//     isActive.value = id;
-//     // 将子组件的数据传递给父组件
-//     emit('changeid', id);
-//     console.log(id);
-// }
-
 const clickupdate = (id) => {
 
     // 如果点击的是已经选中的分类，直接返回，不触发任何操作(第一次加载除外)

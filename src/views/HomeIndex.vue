@@ -1,6 +1,7 @@
 <template>
     <div class="homeindex">
-        <!-- 首页卡片组件 -->
+        <el-card>
+            <!-- 首页卡片组件 -->
         <HomeIndexCard />
         <!-- 分类组件 -->
         <HomeIndexNav />
@@ -15,6 +16,8 @@
                 <HomeIndexGoodsState gTitle="订单提示提示" gDesc="所有订单状态" :gData="orderData"/>
             </el-col>
         </el-row>
+        </el-card>
+        
     </div>
 </template>
 
@@ -49,7 +52,10 @@ getGoodsState().then( result => {
 <style scoped>
 .homeindex {
     height: 630px;
-    overflow-x: hidden;
-    overflow-y: auto;
+
+    .el-card {
+        margin-top: 15px;
+        height: calc(98vh -  120px);
+    }
 }
 </style>

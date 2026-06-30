@@ -5,12 +5,12 @@
             <el-button type="primary" size="small" @click="title = '新增角色'">新增</el-button>
 
             <!-- 底部：表格 -->
-            <el-table :data="tableData" stripe border style="width: 100%;">
-                <el-table-column label="角色ID" prop="id"></el-table-column>
-                <el-table-column label="角色名称" prop="name"></el-table-column>
-                <el-table-column label="角色描述" prop="desc"></el-table-column>
-                <el-table-column label="角色最近更新时间" prop="update_time"></el-table-column>
-                <el-table-column label="角色状态">
+            <el-table :data="tableData" stripe border style="width: 100%;" v-loading="isLoading">
+                <el-table-column label="角色ID" prop="id" align="center"/>
+                <el-table-column label="角色名称" prop="name" align="center"/>
+                <el-table-column label="角色描述" prop="desc" align="center"/>
+                <el-table-column label="角色最近更新时间" prop="update_time" align="center"/>
+                <el-table-column label="角色状态" align="center">
                     <template #default="scoped">
                         <div class="">
                             <!-- 状态:switch -->
@@ -21,7 +21,7 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作">
+                <el-table-column label="操作" align="center">
                     <template #default="scoped">
                         <div>
                             <el-tooltip effect="dark" content="分配权限" placement="top" :enterable="false">
@@ -177,8 +177,8 @@ const changeRoleStatus = async (row) => {
     margin-top: 20px;
 }
 .el-button{
-    width: 100px;
-    height: 30px;
+    width: auto;
+    height: auto;
     border-radius: 10px;
 }
 </style>
